@@ -47,26 +47,24 @@ To install the component in your project, do the following steps:
 3. On the *App components* panel click the *Plus* button next to *Custom components*.
 
 4. Paste the add-on coordinates in the corresponding field as follows: `group:name:version`.
-
++
 * Artifact group: `com.haulmont.addon.maps`
 * Artifact name: `maps-global`
 * Version: `add-on version`
-
++
 Specify the add-on version compatible with the used version of the CUBA platform.
-
++
 |===
 | *Platform Version* | *Add-on Version* 
 | 7.0.x           | 0.2-SNAPSHOT   
 |===
-
-[start=5]
++
 5. Add the repository of https://www.osgeo.org/[OSGeo] tools. On the *Repositories* panel click the *Plus* button and specify the following URL:
-
++
 `http://download.osgeo.org/webdav/geotools/`
-
++
 Then click *OK*.
-
-[start=6]
++
 6. Click *OK* to confirm and save project properties.
 
 == Usage
@@ -80,15 +78,14 @@ To display a map in your application screen use the `com.haulmont.addon.maps.web
 To add the component, do the followings:
 
 1. Declare the `maps` namespace in the root element in the screen XML descriptor:
-
++
 [source,xml]
 ----
 xmlns:maps="http://schemas.haulmont.com/maps/0.1/ui-component.xsd"
 ----
-
-[start=2]
++
 2. Declare the component. XML name of the UI component is `geoMap`. Component declaration example:
-
++
 [source,xml]
 ----
 <maps:geoMap id="map"
@@ -98,8 +95,7 @@ xmlns:maps="http://schemas.haulmont.com/maps/0.1/ui-component.xsd"
               zoom="14"/>
 </maps:geoMap>
 ----
-
-[start=3]
++
 3. Define the basic component properties `id`, `height`, `width`, `center`, `zoom`, if necessary where:
 
  * *center* - coordinates of the initial geographical center of the map (longitude, latitude)
