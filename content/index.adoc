@@ -1,24 +1,28 @@
-= Maps Manual 
+= Maps Add-on Manual
 :toc: left
-:toclevels: 5
-:sectnumlevels: 5
+:toc-title: Contents
+:toclevels: 6
+:sectnumlevels: 6
+:stylesheet: studio.css
 :linkcss:
+:linkattrs:
 :source-highlighter: coderay
-:doctype: book
-:icons: font
 :imagesdir: images
-:sectnums:
+:stylesdir: styles
+:sourcesdir: ../../source
+:doctype: book
+:docinfo: private
+:docinfodir: ../../docinfo
 :sectlinks:
 :sectanchors:
-:nofooter:
-:revnumber: 0.1
-:version-label: Version
-:revremark: Copyright (c) 2019 Haulmont (www.haulmont.com)
 :lang: en
-:flowable_doc_url: https://www.flowable.org/docs/userguide/index.html
-:cuba_doc_url: https://doc.cuba-platform.com/manual-7.0
+:revremark: Copyright (c) 2019 Haulmont (www.haulmont.com)
+:idea-version: 2018.3
+:main_man_url: https://doc.cuba-platform.com/manual-7.0
+:rel_notes_url: http://files.cuba-platform.com/cuba/release-notes/7.0
+:sectnums:
 
-= Overview
+== Overview
 
 This component provides an ability to display maps using a preferable tile provider. The add-on is based on https://leafletjs.com/[LeafletJS] library and supports XYZ tiles as well as professional WMS services.
 
@@ -168,19 +172,19 @@ To add a tile layer on a map:
 
 [source,xml]
 ----
-   <maps:tile id="tiles"
-              urlPattern="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&#169; &lt;a href=&quot;https://www.openstreetmap.org/copyright&quot;&gt;OpenStreetMap&lt;/a&gt; contributors"/>
+<maps:tile id="tiles"
+           urlPattern="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+           attribution="&#169; &lt;a href=&quot;https://www.openstreetmap.org/copyright&quot;&gt;OpenStreetMap&lt;/a&gt; contributors"/>
 ----
 
 * or perform in the screen controller using `com.haulmont.addon.maps.web.gui.components.layer.TileLayer` class:
 
 [source,java]
 ----
-   TileLayer tileLayer = new TileLayer();
-   tileLayer.setUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-   tileLayer.setAttributionString("&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors");
-   map.addLayer(tileLayer);
+TileLayer tileLayer = new TileLayer();
+tileLayer.setUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+tileLayer.setAttributionString("&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors");
+map.addLayer(tileLayer);
 ----
 `id` and `url` parameters are required.
 
@@ -208,21 +212,21 @@ Various WMS services can be used as a map provider.
 
 [source,xml]
 ----
-  <maps:wms id="wms"
-            url="http://ows.terrestris.de/osm/service?"
-            layers="OSM-WMS"
-            format="image/png"/>
+<maps:wms id="wms"
+          url="http://ows.terrestris.de/osm/service?"
+          layers="OSM-WMS"
+          format="image/png"/>
 ----
 
 * performed in the screen controller using `com.haulmont.addon.maps.web.gui.components.layer.WMSTileLayer` class:
 
 [source,java]
 ----
-   WMSTileLayer wmsTileLayer = new WMSTileLayer("wms");
-   wmsTileLayer.setUrl("http://ows.terrestris.de/osm/service?");
-   wmsTileLayer.setLayers("OSM-WMS");
-   wmsTileLayer.setFormat("image/png");
-   map.addLayer(wmsTileLayer);
+WMSTileLayer wmsTileLayer = new WMSTileLayer("wms");
+wmsTileLayer.setUrl("http://ows.terrestris.de/osm/service?");
+wmsTileLayer.setLayers("OSM-WMS");
+wmsTileLayer.setFormat("image/png");
+map.addLayer(wmsTileLayer);
 ----
 
 `id`, `url` and `layers` are required parameters. Other parameters have default values, which can be redefined.
@@ -247,9 +251,9 @@ Geo object is an entity having a property of a geometry type. This property shou
 The property must have the following annotations:
 
 * `@Geometry` - marks that the property is to be used when displaying the geo object on a map.
-
-  Note: geo object must have one geometry property, otherwise an exception will be thrown when drawing the layer.
-
++
+Note: geo object must have one geometry property, otherwise an exception will be thrown when drawing the layer.
++
 * `@MetaProperty` - specifies corresponding datatype.
 
 * `@Convert` - specifies a JPA converter defining how the datatype will be persisted. JPA converters for the component's datatypes are included in the package: `com.haulmont.addon.maps.gis.converters`.
@@ -287,17 +291,17 @@ Vector layer can be:
 
 [source,xml]
 ----
-   <maps:vector id="orderLayer"
-                dataContainer="orderDc"
-                editable="true"/>
+<maps:vector id="orderLayer"
+             dataContainer="orderDc"
+             editable="true"/>
 ----
 
 * or created in the screen controller:
 
 [source,java]
 ----
-   VectorLayer<Order> orderLayer = new VectorLayer<>("orderLayer", new ContainerVectorLayerItems<>(ordersDc));
-   map.addLayer(orderLayer);
+VectorLayer<Order> orderLayer = new VectorLayer<>("orderLayer", new ContainerVectorLayerItems<>(ordersDc));
+map.addLayer(orderLayer);
 ----
 
 Vector layer works with both `InstanceContainer` and `CollectionContainer`.
@@ -308,13 +312,13 @@ Vector layer works with both `InstanceContainer` and `CollectionContainer`.
 
 [source,java]
 ----
-    @Install(to = "map.territoryLayer", subject = "styleProvider")
-    private GeometryStyle territoryLayerStyleProvider(Territory territory) {
+@Install(to = "map.territoryLayer", subject = "styleProvider")
+private GeometryStyle territoryLayerStyleProvider(Territory territory) {
         return new PolygonStyle()
-                .setFillColor("#08a343")
-                .setStrokeColor("#004912")
-                .setFillOpacity(0.3)
-                .setStrokeWeight(1);
+               .setFillColor("#08a343")
+               .setStrokeColor("#004912")
+               .setFillOpacity(0.3)
+               .setStrokeWeight(1);
     }
 ----
 
@@ -452,14 +456,15 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
     * `void setStyleProvider(Function<? super T, GeometryStyle>)` — sets a function that determines geometry style for a given geo object. In CUBA 7.0 screens you can perform this declaratively using the `@Install` annotation in the screen controller.
 
     * `setPopupContentProvider(Function<? super T, String>)` — sets a function that determines content for bound popups which will be opened by clicking on geo objects on a map. In CUBA 7 screens you can perform this declaratively using the @Install annotation in the screen controller, for example:
++
+[source,java]
+----
+@Install(to = "map.territoryLayer", subject = "popupContentProvider")
+private String territoryLayerPopupContentProvider(Territory territory) {
+return territory.getName();
+}
+----
 
-    [source,java]
-    ----
-    @Install(to = "map.territoryLayer", subject = "popupContentProvider")
-    private String territoryLayerPopupContentProvider(Territory territory) {
-        return territory.getName();
-    }
-    ----
     * `void setPopupWindowOptions(PopupWindowOptions)` — sets the explicit style parameters for geo object's bound popups.
     * `void setSelectedGeoObject(T)` — sets the selected geo object of the layer.
 
