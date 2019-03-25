@@ -16,6 +16,9 @@
 :sectlinks:
 :sectanchors:
 :lang: en
+:version-label: Version
+:plugin-version: 7.0
+:revnumber: 7.0
 :revremark: Copyright (c) 2019 Haulmont (www.haulmont.com)
 :idea-version: 2018.3
 :main_man_url: https://doc.cuba-platform.com/manual-7.0
