@@ -10,24 +10,38 @@ buildscript {
 
 apply plugin: 'org.asciidoctor.convert'
 
+ext.docsVersion = rootProject.hasProperty('docsVersion') ? rootProject['docsVersion'] : '0.2'
+
 asciidoctor {
     sourceDir = file('content')
     sources {
         include 'index.adoc'
     }
     outputDir = file('build')
-    }
+}
 
 asciidoctor.doLast {
-    copy{
+    copy {
         from 'images'
         into 'build/html5/images'
     }
-    copy{
+    copy {
         from 'styles'
         into 'build/html5/styles'
     }
+    copy {
+        from 'js'
+        into 'build/html5/js'
+    }
 }
 
+build.dependsOn(asciidoctor)
 
-
+build.doLast {
+    def tmpDir = new File(buildDir, "tmp/war")
+    copy {
+        from "$buildDir/html5"
+        into tmpDir
+    }
+    ant.jar(destfile: "$buildDir/war/maps-" + docsVersion + ".war", basedir: tmpDir)
+}
