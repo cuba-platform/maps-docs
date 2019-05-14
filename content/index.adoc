@@ -16,13 +16,13 @@
 :sectlinks:
 :sectanchors:
 :lang: en
-:version-label: Version
-:plugin-version: 7.0
-:revnumber: 7.0
 :revremark: Copyright (c) 2019 Haulmont (www.haulmont.com)
 :idea-version: 2018.3
+:version-label: Version
+:plugin-version: 7.0
 :main_man_url: https://doc.cuba-platform.com/manual-7.0
 :rel_notes_url: http://files.cuba-platform.com/cuba/release-notes/7.0
+:revnumber: 7.0
 :sectnums:
 
 == Overview
@@ -62,8 +62,8 @@ To install the component in your project, do the following steps:
 Specify the add-on version compatible with the used version of the CUBA platform.
 +
 |===
-| *Platform Version* | *Add-on Version* 
-| 7.0.x           | 0.2-SNAPSHOT   
+| *Platform Version* | *Add-on Version*
+| 7.0.x              | 0.2-SNAPSHOT
 |===
 +
 5. Add the repository of https://www.osgeo.org/[OSGeo] tools. On the *Repositories* panel click the *Plus* button and specify the following URL:
@@ -245,11 +245,11 @@ A vector layer is used to display geo objects on a map. Geo objects are displaye
 Geo object is an entity having a property of a geometry type. This property should have one of the geo-specific datatypes that are included in the `com.haulmont.addon.maps.gis.datatypes` package:
 
 |===
-| *Datatype* | *Java type* 
-| GeoPoint         | com.vividsolutions.jts.geom.Point       
-| GeoPolyline      | com.vividsolutions.jts.geom.LineString  
+| *Datatype* | *Java type*
+| GeoPoint         | com.vividsolutions.jts.geom.Point
+| GeoPolyline      | com.vividsolutions.jts.geom.LineString
 | GeoPolygon       | com.vividsolutions.jts.geom.Polygon
-|===     
+|===
 
 The property must have the following annotations:
 
@@ -328,6 +328,31 @@ private GeometryStyle territoryLayerStyleProvider(Territory territory) {
 `setSelectedGeoObject()` method sets the geo object which the layer is focused on. Geo objects can be selected by user click or automatically from the associated data container. For example, if an entity is opened in an editor screen it will be implicitly selected in a corresponding vector layer.
 
 See more `VectorLayer` methods in <<maps-api>>.
+
+===== Clustering
+
+For a vector layer consisting of geo points it is possible to group nearby points into clusters:
+
+image::maps-clustering.png[]
+
+To enable clustering add `cluster` element inside `vector` in the XML-descriptor:
+
+[source,xml]
+----
+<maps:vector id="locations" dataContainer="locationsDc" >
+  <maps:cluster/>
+</maps:vector>
+----
+
+You can specify additional clustering options:
+
+* *radius* - maximum radius that a cluster will cover, in pixels (default: 80).
+* *weightProperty* - if specified, then each point of the layer will have a weight value (int) defined by weight property of a geo object.
+This value will be used when calculating the summed up value of the cluster (by default, the number of points is used).
+* *showCoverage* - show bounds of the cluster when hovering a mouse over it.
+* *disableAtZoom* - specifies a zoom level from which clustering will be disabled.
+* *showSinglePointAsCluster* - show single point as a cluster of 1 size.
+
 
 ==== Canvas Layer
 
@@ -414,6 +439,7 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
     * `void setZoomLevel(double)` — sets map zoom level.
     * `void setMaxZoom(int)` — sets maximum map zoom level.
     * `void setMinZoom(int)` — sets minimum map zoom level.
+    * `GeoMap.Bounds getBounds()` — returns the bounds of the map which define the viewport of the map.
     * `void setReadOnly(boolean)` — enables/disables zooming and dragging the map (changing the viewing area).
     * `CanvasLayer getCanvas()` — returns the canvas layer of the map.
     * `void selectLayer(Layer layer)` — sets the selected (active) layer of the map.
@@ -429,6 +455,8 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
     * `ClickEvent` — event fired after clicking on a map.
     * `RightClickEvent` — event fired after right click on a map.
     * `MoveEndEvent` — event fired after changing the map's viewing area (as a result of zooming/dragging).
+    * `ZoomEndEvent` — event fired after zooming a map.
+    * `DragEndEvent` — event fired after dragging a map.
     * `LayerAddedEvent` — event fired after adding a layer on a map.
     * `LayerRemovedEvent` — event fired after removing a layer from a map.
     * `SelectedLayerChangedEvent` — event fired after changing the map's selected layer.
