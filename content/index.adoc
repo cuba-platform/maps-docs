@@ -22,7 +22,7 @@
 :plugin-version: 7.0
 :main_man_url: https://doc.cuba-platform.com/manual-7.0
 :rel_notes_url: http://files.cuba-platform.com/cuba/release-notes/7.0
-:revnumber: 7.0
+:revnumber: 0.1
 :sectnums:
 
 == Overview
@@ -58,13 +58,6 @@ To install the component in your project, do the following steps:
 * Artifact group: `com.haulmont.addon.maps`
 * Artifact name: `maps-global`
 * Version: `add-on version`
-+
-Specify the add-on version compatible with the used version of the CUBA platform.
-+
-|===
-| *Platform Version* | *Add-on Version*
-| 7.0.x              | 0.2-SNAPSHOT
-|===
 +
 5. Add the repository of https://www.osgeo.org/[OSGeo] tools. On the *Repositories* panel click the *Plus* button and specify the following URL:
 +
