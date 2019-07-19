@@ -27,60 +27,80 @@
 
 == Overview
 
-This component provides an ability to display maps using a preferable tile provider. The add-on is based on https://leafletjs.com/[LeafletJS] library and supports XYZ tiles as well as professional WMS services.
+The add-on gives you an easy way to enrich your application with visual representation and intuitive manipulation for spatial data. With this add-on you are free to use a preferable map provider that meets your needs as it is compatible with the <<appendix-b-web-map-service>> protocol as well as <<appendix-b-xyz-tiles>> services.
 
-A layer-based approach enables using layers as structural units of a map. Tile layers are used as a base background and vector layers are used to show and set entities on a map.
+The component integrates spatial types (point, polyline, polygon) from https://locationtech.github.io/jts/[JTS Topology Suite (JTS)] — the most popular Java library for working with spatial data. The add-on provides all the required features to build a comprehensive geographical information system on CUBA.
 
-The add-on extends standard CUBA datatypes with geometry types from the https://locationtech.github.io/jts/[JTS] library, which simplifies creating geometry properties.
+The add-on supports the traditional multi-layer structure, so it gives full freedom to create well-structured maps of any content.
+
 
 Key features:
 
-* Not coupled to a particular map provider
-* Straightforward binding entities to a map
-* Layer-based design
-* Declarative way of defining maps
-* Simple drawing geometries
+* Introduces a visual component for Generic UI with rich and clear API.
 
-See https://git.haulmont.com/app-components/maps-addon-demo[sample application], using this component.
+* Supports drawing and interactive editing of geo-entities — entities with geometry attributes.
+
+* Compatible with the Web Map Service protocol as well as XYZ tile services.
+
+* Provides features for geoanalysis: heatmaps and clustering.
+
+See https://github.com/cuba-platform/maps-addon-demo[sample application], using this component.
 
 == Installation
 
-To install the component in your project, do the following steps:
+The beta version of the Maps add-on is distributed with a free trial period up to September 1, 2019.
 
-1. Open your application in CUBA Studio.
+To install the beta version of the component in your project, do the following steps:
 
-2. Click *Edit* in the *Project properties* panel.
+1. Download a ZIP archive that contains add-on artifacts by the http://download.cuba-platform.com/artifacts/maps-addon-alpha[link].
++
+2. Put the artifacts to the local maven repository: `~/.m2/repository/…` . You should have a files structure like this:    
++
+[source]
+----
+user_home_directory    
+ .m2    
+   repository    
+    com    
+     haulmont    
+      addon    
+       maps`   
+        ...
+----
++
+3. Open your project that uses the platform version 7.0.x in CUBA Studio.
++
+4. Open *Project Properties* and select *Use local Maven repository* check box.
++
+image::properties.png[]
++
+5. On the *App components* panel click the *Plus* button next to *Custom components*.
++
+6. Paste the coordinates `com.haulmont.addon.maps:maps-global:0.1.alpha` in the corresponding field.
++
+image::coordinates.png[]
++
+7. Click *OK* to confirm and save project properties.
 
-3. On the *App components* panel click the *Plus* button next to *Custom components*.
+== Components Compatibility
 
-4. Paste the add-on coordinates in the corresponding field as follows: `group:name:version`.
-+
-* Artifact group: `com.haulmont.addon.maps`
-* Artifact name: `maps-global`
-* Version: `add-on version`
-+
-Specify the add-on version compatible with the used version of the CUBA platform.
-+
-|===
-| *Platform Version* | *Add-on Version*
-| 7.0.x              | 0.2-SNAPSHOT
-|===
-+
-5. Add the repository of https://www.osgeo.org/[OSGeo] tools. On the *Repositories* panel click the *Plus* button and specify the following URL:
-+
-`http://download.osgeo.org/webdav/geotools/`
-+
-Then click *OK*.
-+
-6. Click *OK* to confirm and save project properties.
+If your project uses Charts and Maps add-on (or other add-ons providing their own widgetsets), you should add `web-toolkit` module in your project. It is needed to integrate widgetsets from all used add-ons.
+
+image::web-toolkit.png[]
 
 == Usage
 
-The add-on enables you working with a map. Content of a map is built on layers which are structural units of a map. To operate with maps you need to add a map component and one and more layers. There are raster layers represented by tiles and vector layers consisting of vector geometries.
+The add-on supports the traditional multi-layer structure commonly used in professional GIS systems. To operate with maps you need to add a visual component — `GeoMap` and one and more layers.
 
-=== Map Component
+Layers are used as structural units of maps. For example, one layer may be a tiled base map, another layer may contain polygons describing districts, the third layer might consist of geographical points (locations of customers, shops and so on). By combining these layers, you build a complete map.
 
-To display a map in your application screen use the `com.haulmont.addon.maps.web.gui.components.GeoMap` UI component.
+image::layers-picture.png[]
+
+You are able to define the main map parameters along with the layers in the XML descriptor of the component.
+
+=== Inserting a Map into a Screen
+
+The `com.haulmont.addon.maps.web.gui.components.GeoMap` UI component is used to display a map in your application screen.
 
 To add the component, do the followings:
 
@@ -96,17 +116,47 @@ xmlns:maps="http://schemas.haulmont.com/maps/0.1/ui-component.xsd"
 [source,xml]
 ----
 <maps:geoMap id="map"
-              height="600px"
-              width="100%"
-              center="-46.005163, 51.532268"
-              zoom="14"/>
+             height="100%"
+             width="100%"
+             center="-99.755859, 39.164141"
+             zoom="4"/>
 </maps:geoMap>
 ----
 +
 3. Define the basic component properties `id`, `height`, `width`, `center`, `zoom`, if necessary where:
++
+ * *center* — coordinates of the initial geographical center of the map (longitude, latitude).
+ * *zoom* — initial zoom level. The default value is 15.
++
 
- * *center* - coordinates of the initial geographical center of the map (longitude, latitude)
- * *zoom* - initial zoom level
+4. Add one of raster layers to display a map on the screen. Here is an example of OpenStreetMap tile layer.
++
+[source,xml]
+----
+<maps:tile id="tiles"
+          tileProvider="maps_OpenStreetMap"/>
+----
+
+XML descriptor can look like this one:
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd"
+        caption="Map"
+        messagesPack="com.company.mapstest.web"
+        xmlns:maps="http://schemas.haulmont.com/maps/0.1/ui-component.xsd">
+    <layout>
+        <maps:geoMap id="map" height="100%" width="100%" center="-99.755859, 39.164141" zoom="4">
+          <maps:tile id="tiles"
+                     tileProvider="maps_OpenStreetMap"/>
+        </maps:geoMap>
+    </layout>
+</window>
+----
+
+You can see that OpenStreetMap is added as a tile layout. The screen contains a full-screen map with initial zoom 4.
+
+image::openstreetmap.png[]
 
 Additional configuration of the map and its layers can be performed in the screen controller. You need to add the component declared in the XML descriptor with `@Inject` annotation:
 
@@ -117,22 +167,29 @@ private GeoMap map;
 
 @Subscribe
 protected void onBeforeShow(BeforeShowEvent event) {
-map.setCenter(-46.005163D, 51.532268D);
-map.setZoomLevel(13);
+map.setCenter(-99.755859D, 39.164141D);
+map.setZoomLevel(4);
 
-...
+TileLayer tileLayer = new TileLayer();
+   tileLayer.setUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+   tileLayer.setAttributionString("&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors");
+   map.addLayer(tileLayer);
 }
 ----
 
 See more `GeoMap` methods and events in <<maps-api>>.
 
-=== Layers
+=== Adding Layers on the Map
 
-The component supports raster layers - XYZ tiles and WMS-services for using as a base layer and vector layers containing geographical points, polylines, and polygons. Basically, a map contains one raster layer - base layer and one or more vector layers above it. Canvas is a utility layer and belongs to a map by default.
+Basically, layers are divided into raster and vector layers. Raster layers consist of raster images, while vector layers consist of vector geometries.
 
-To add a layer on a map perform its configuration in one of the following ways:
+The add-on supports the following types of layers:
 
-* declare the `layers` element and its configuration in the `geoMap` element:
+ * *Tile layer* is used to display tiles provided by <<appendix-b-xyz-tiles>> services.
+ * *Web Map Service (WMS) layer* is used to display tiles from <<appendix-b-web-map-service>>.
+ * *Vector layer* contains geo-objects (entities with geometry attributes).
+
+To add a layer on a map declare the `layers` element and its configuration in the `geoMap` element in the XML descriptor. Here is an example of one raster layer and two vector layers.
 
 [source,xml]
 ----
@@ -145,7 +202,16 @@ To add a layer on a map perform its configuration in one of the following ways:
    </maps:geoMap>
 ----
 
-* perform configuration of the layer in the screen controller:
+`selectedLayer` is a layer which the map is focused on. Selected layer fires events, reacts on user clicks and can be modified by UI interaction in case the layer is editable.
+
+Parameters are common for every type of layers:
+
+ * *id* — required parameter, specifies the id of the layer.
+ * *visible* — whether the layer is visible.
+ * *minZoom* — minimum zoom level down to which the layer is visible (inclusive).
+ * *maxZoom* — maximum zoom level up to which the layer is visible (inclusive).
+
+Also, you can perform configuration of the layer in the screen controller:
 
 [source,java]
 ----
@@ -155,45 +221,29 @@ To add a layer on a map perform its configuration in one of the following ways:
    map.addLayer(tileLayer);
 ----
 
-`selectedLayer` is a layer which the map is focused on. Selected layer fires events, reacts on user clicks and can be modified by UI interaction in case the layer is editable.
+==== Adding Raster Layers
 
-==== Raster Layers
-
-Raster layer consists of raster images which is a grid of pixels. Raster layer is usually served as a base background layer of a map.
-
-You can download raster images using different providers: tile servers and WMS-services.
+Raster layers consist of raster images which is a grid of pixels. Raster layer is usually served as a base background layer of a map. You can download raster images using different providers: tile servers and WMS services.
 
 ===== Tile Layer
 
-`TileLayer` is used to load and display tiles that are served through a web server with URL like `http://.../{z}/{x}/{y}.png`. For example, https://www.openstreetmap.org[OpenStreetMap] tiles URL-pattern is:
+`TileLayer` is used to load and display tiles that are served through a web server with URL like `http://.../{z}/{x}/{y}.png`. For example, https://www.openstreetmap.org[OpenStreetMap] tiles URL pattern is: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`.
 
-`https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`.
-
-To add a tile layer on a map:
-
-* declare it in the XML descriptor:
+To add a tile layer on a map declare it in the XML descriptor:
 
 [source,xml]
 ----
 <maps:tile id="tiles"
-           urlPattern="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-           attribution="&#169; &lt;a href=&quot;https://www.openstreetmap.org/copyright&quot;&gt;OpenStreetMap&lt;/a&gt; contributors"/>
+              urlPattern="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution="&#169; &lt;a href=&quot;https://www.openstreetmap.org/copyright&quot;&gt;OpenStreetMap&lt;/a&gt; contributors"/>
 ----
 
-* or perform in the screen controller using `com.haulmont.addon.maps.web.gui.components.layer.TileLayer` class:
-
-[source,java]
-----
-TileLayer tileLayer = new TileLayer();
-tileLayer.setUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-tileLayer.setAttributionString("&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors");
-map.addLayer(tileLayer);
-----
 `id` and `url` parameters are required.
 
-Note that the most tile servers require attribution, which you can set in `attribution` parameter.
+*Note* that the most tile servers require attribution, which you can set in `attribution` parameter. In our example the credit ©OpenStreetMap contributors will appear in the lower-right corner.
 
 In order not to clutter the XML descriptors with the URL and attribution strings:
+
 1. Move tile server settings to a Spring bean implementing `com.haulmont.addon.maps.web.gui.components.layer.TileProvider` interface.
 2. Specify a bean name in a `tileProvider` attribute of the `tile` element.
 
@@ -205,13 +255,21 @@ OpenStreetMap tile provider comes out of the box, so you can use it like this:
            tileProvider="maps_OpenStreetMap"/>
 ----
 
+Additionally you can perform the tile layer in the screen controller using `com.haulmont.addon.maps.web.gui.components.layer.TileLayer` class:
+
+[source,java]
+----
+TileLayer tileLayer = new TileLayer();
+   tileLayer.setUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+   tileLayer.setAttributionString("&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors");
+   map.addLayer(tileLayer);
+----
+
 ===== WMS Layer
 
 Various WMS services can be used as a map provider.
 
-`WMSTileLayer` layer can be added one of the following ways:
-
-* declared in the XML descriptor:
+`WMSTileLayer` layer can be declared in the XML descriptor:
 
 [source,xml]
 ----
@@ -221,7 +279,11 @@ Various WMS services can be used as a map provider.
           format="image/png"/>
 ----
 
-* performed in the screen controller using `com.haulmont.addon.maps.web.gui.components.layer.WMSTileLayer` class:
+`id`, `url` and `layers` are required parameters. Other parameters have default values, which can be redefined.
+
+image::wms.png[]
+
+Also, you can perform a layer in the screen controller using `com.haulmont.addon.maps.web.gui.components.layer.WMSTileLayer` class:
 
 [source,java]
 ----
@@ -232,17 +294,11 @@ wmsTileLayer.setFormat("image/png");
 map.addLayer(wmsTileLayer);
 ----
 
-`id`, `url` and `layers` are required parameters. Other parameters have default values, which can be redefined.
-
 See more `WMSTileLayer` methods in <<maps-api>>.
 
-==== Vector Layers
+==== Creating Geo-objects
 
-A vector layer is used to display geo objects on a map. Geo objects are displayed on a map as points, polylines or polygons.
-
-===== Geo Objects
-
-Geo object is an entity having a property of a geometry type. This property should have one of the geo-specific datatypes that are included in the `com.haulmont.addon.maps.gis.datatypes` package:
+Geo-object is an entity having a property of a geometry type. This property should have one of the geo-specific datatypes that are included in the `com.haulmont.addon.maps.gis.datatypes` package:
 
 |===
 | *Datatype* | *Java type*
@@ -251,20 +307,24 @@ Geo object is an entity having a property of a geometry type. This property shou
 | GeoPolygon       | com.vividsolutions.jts.geom.Polygon
 |===
 
-The property must have the following annotations:
+To add the property:
 
-* `@Geometry` - marks that the property is to be used when displaying the geo object on a map.
+1. Create a new attribute and select a geo-specific datatype from the list.
 +
-Note: geo object must have one geometry property, otherwise an exception will be thrown when drawing the layer.
+image::geotypes.png[]
 +
-* `@MetaProperty` - specifies corresponding datatype.
-
-* `@Convert` - specifies a JPA converter defining how the datatype will be persisted. JPA converters for the component's datatypes are included in the package: `com.haulmont.addon.maps.gis.converters`.
+2. Add the following annotations:
++
+* `@Geometry` — marks that the property is to be used when displaying the geo-object on a map.
++
+*Note*: geo-object must have one geometry property, otherwise an exception will be thrown when drawing the layer.
++
+* `@Convert` — specifies a JPA converter defining how the datatype will be persisted. JPA converters for the component's datatypes are included in the package: `com.haulmont.addon.maps.gis.converters`.
 The current version of the component includes converters that transform coordinates into the https://en.wikipedia.org/wiki/Well-known_text[WKT]
 format which consequently persists as a text.
 While loading from DB this text will be parsed back into the objects.
 
-Here is an example of geo object `Address`:
+Here is an example of geo-object `Address`:
 
 [source,java]
 ----
@@ -282,24 +342,42 @@ public class Address extends StandardEntity {
 }
 ----
 
-As you can see, `Address` is a simple entity, one of which properties (`location`) is of a `com.vividsolutions.jts.geom.Point` type.
+As you can see, `Address` is a simple entity, one of which properties `location` is of a `com.vividsolutions.jts.geom.Point` type.
+
+
+==== Adding Vector Layers
+
+Vector layers help to effectively work with a group of related geo-objects. Vector layers enable simple displaying, interactive editing and drawing geo-objects on a map.
 
 ===== VectorLayer Class
 
-`VectorLayer` serves as a connector between data and a map.  Geo objects are provided by Data Containers (or Datasources in case of using in legacy screens).
+`VectorLayer` is a base layer for displaying your entities on the map. It is a data-aware component acting as a connector between data (geo-objects) and a map.
 
-Vector layer can be:
-
-* declared in the XML descriptor:
+To bind geo-objects with the layer you need to pass a `datacontainer` (or `datasource` in case of using in legacy screens) to the vector layer. This can be declared in the XML descriptor:
 
 [source,xml]
 ----
-<maps:vector id="orderLayer"
-             dataContainer="orderDc"
-             editable="true"/>
+<maps:geoMap id="map">
+  <maps:layers>
+    <maps:vector id="orderLayer" dataContainer="orderDc"/>
+  </maps:layers>
+</maps:geoMap>
 ----
 
-* or created in the screen controller:
+`id` and `dataContainer` (`dataSource` in case of using in legacy screens) are required parameters. Vector layer works with both `InstanceContainer` and `CollectionContainer`.
+
+To make the layer editable add the `editable` parameter:
+
+[source,xml]
+----
+<maps:geoMap id="map">
+  <maps:layers>
+    <maps:vector id="orderLayer" dataContainer="orderDc" editable="true"/>
+  </maps:layers>
+</maps:geoMap>
+----
+
+Additionally you can create `VectorLayer` in the screen controller:
 
 [source,java]
 ----
@@ -307,12 +385,7 @@ VectorLayer<Order> orderLayer = new VectorLayer<>("orderLayer", new ContainerVec
 map.addLayer(orderLayer);
 ----
 
-Vector layer works with both `InstanceContainer` and `CollectionContainer`.
-
-`id` and `dataContainer` (`dataSource` in case of using in legacy screens) are required parameters.
-
-`setStyleProvider()` method sets a function that determines geometry style for a given geo object. In CUBA 7.0 screens you can perform this declaratively using the @Install annotation in the screen controller, for example:
-
+To determine geometry style for geo-objects use `setStyleProvider()` method. In CUBA 7.0 screens you can perform this declaratively using the `@Install` annotation in the screen controller, for example:
 [source,java]
 ----
 @Install(to = "map.territoryLayer", subject = "styleProvider")
@@ -325,17 +398,19 @@ private GeometryStyle territoryLayerStyleProvider(Territory territory) {
     }
 ----
 
-`setSelectedGeoObject()` method sets the geo object which the layer is focused on. Geo objects can be selected by user click or automatically from the associated data container. For example, if an entity is opened in an editor screen it will be implicitly selected in a corresponding vector layer.
+Geo-objects can be selected by user click or automatically from the associated data container. 
+
+`setSelectedGeoObject()` method sets the geo-object which the layer is focused on. For example, if an entity is opened in an editor screen it will be implicitly selected in a corresponding vector layer.
 
 See more `VectorLayer` methods in <<maps-api>>.
 
 ===== Clustering
 
-For a vector layer consisting of geo points it is possible to group nearby points into clusters:
+For a vector layer consisting of geo-points it is possible to group nearby points into clusters:
 
 image::maps-clustering.png[]
 
-To enable clustering add `cluster` element inside `vector` in the XML-descriptor:
+To enable clustering add `cluster` element inside `vector` in the XML descriptor:
 
 [source,xml]
 ----
@@ -346,17 +421,34 @@ To enable clustering add `cluster` element inside `vector` in the XML-descriptor
 
 You can specify additional clustering options:
 
-* *radius* - maximum radius that a cluster will cover, in pixels (default: 80).
-* *weightProperty* - if specified, then each point of the layer will have a weight value (int) defined by weight property of a geo object.
+* *radius* — maximum radius that a cluster will cover, in pixels (default: 80).
+* *weightProperty* — if specified, then each point of the layer will have a weight value (int) defined by weight property of a geo-object.
 This value will be used when calculating the summed up value of the cluster (by default, the number of points is used).
-* *showCoverage* - show bounds of the cluster when hovering a mouse over it.
-* *disableAtZoom* - specifies a zoom level from which clustering will be disabled.
-* *showSinglePointAsCluster* - show single point as a cluster of 1 size.
+* *showCoverage* — show bounds of the cluster when hovering a mouse over it.
+* *disableAtZoom* — specifies a zoom level from which clustering will be disabled.
+* *showSinglePointAsCluster* — show single point as a cluster of 1 size.
 
+==== Drawing Geometry 
 
-==== Canvas Layer
+Open a screen containing a map with an editable `VectorLayer`.
 
-`CanvasLayer` is a utility layer belonging to a map by default. This layer is used to draw and display geometries on a map. It is similar to `VectorLayer` since they both display vector geometries. The difference is that `VectorLayer` works with geo objects while `CanvasLayer` works just with geometries.
+To draw *a point* just click on the map.
+
+image::point.png[]
+
+For drawing *a polyline* or *a polygon* specify the firs point and continue clicking on the map. To stop drawing click the last point twice.
+
+image::line.png[]
+
+To add a hole inside a polygon right-click and select *Add hole*. Start drawing a hole inside the poligon.
+
+image::polygon1.png[]
+
+To delete a geometry right-click and select *Clear geometry*.
+
+==== Using Canvas Layer
+
+`CanvasLayer` is a utility layer belonging to a map by default. This layer is used to draw and display geometries on a map. It is similar to `VectorLayer` since they both display vector geometries. The difference is that `VectorLayer` works with geo-objects while `CanvasLayer` works just with geometries.
 It makes the task of displaying some geometry on a map really straightforward so there is no need to store data in an entity.
 
 To obtain the canvas layer of a map call `map.getCanvas()`.
@@ -371,8 +463,7 @@ Point point = address.getLocation();
 canvasLayer.addPoint(point);
 ----
 
-
-Methods that add geometries on a canvas return an object that represents this geometry on the canvas: `CanvasLayer.Point`, `CanvasLayer.Polyline` or `CanvasLayer.Polygon`. Using this object you can define a style or popup window, subscribe to events connected with the geometry, or use this object when you want to remove the geometry from the canvas.
+Methods that add geometries on a canvas return an object that represents this geometry on the canvas: `CanvasLayer.Point`, `CanvasLayer.Polyline` or `CanvasLayer.Polygon`. Using this object you can define a style or pop-up window, subscribe to events connected with the geometry, or use this object when you want to remove the geometry from the canvas.
 
 Here is an example:
 
@@ -398,7 +489,7 @@ canvasLayer.drawPoint(point -> {
 });
 ----
 
-Note that before drawing geometries via UI on the canvas you need to select the canvas on the map by calling `map.selectLayerById(CanvasLayer.ID)`.
+*Note* that before drawing geometries via UI on the canvas you need to select the canvas on the map by calling `map.selectLayerById(CanvasLayer.ID)`.
 You can also specify the selected layer in the XML descriptor:
 
 [source,xml]
@@ -413,28 +504,80 @@ You can also specify the selected layer in the XML descriptor:
 
 See more `CanvasLayer` methods and events in <<maps-api>>.
 
-== Screens
+==== Additional Options
 
-After adding a map component and a raster layer into your application you can see a map on your screens.
+===== Heatmaps
 
-image::maps-map.png[]
+Heatmaps provide a visual representation of data density across a set of geographical points.
 
-Here is an example of displaying a point, polyline, and polygon on a map.
+image::heatmap.png[]
 
-image::maps-canvas.png[]
+`GeoMap` UI component provides a method for adding a heatmap overlay to a map: `addHeatMap(Map<Point, Double> intensityMap)`, where each entry of the map represents a geo-point and it's intensity value, which should range between 0 and 1.
 
-In the edit mode a polyline and polygon have points for moving and changing the shape of them. Use context menu to remove a geometry or add empty area into a polygon.
+You can customize the appearance of a heatmap and change the intensity value range using the overloaded method `addHeatMap(Map<Point, Double> intensityMap, HeatMapOptions heatMapOptions)`.
 
-image::maps-polygon.png[]
+Class `HeatMapOptions` contains various options for a heatmap:
 
-Here is an example of two vector layers working with points and polygons.
+ * *maximumIntensity* — the maximum point intensity (default: 1).
+ * *blur* — the amount of blur in a point (default: 15).
+ * *radius* — the radius of each point of a heatmap in pixels (default: 25).
+ * *gradient* — the color gradient config defined by a map of pairs `[intensityValue : rgbColor]`. For example, `[0.4: 'blue', 0.65: 'lime', 1: 'red']`.
+ * *minOpacity* — the minimum opacity the heat will start at (default: 0.05).
+ * *maxZoom* — the zoom level where the points reach maximum intensity (as intensity scales with zoom). By default, equals the maxZoom of a map.
 
-image::maps-layers.png[]
+===== Pop-up Window
+
+The add-on provides an ability to display some information in a pop-up window on a map.
+
+The `GeoMap` UI component has the `openPopup(PopupWindow popupWindow)` method that instantly opens the given pop-up window. Class `PopupWindow` contains two main parameters:
+
+* *point* — the geographical point where the pop-up will be opened.
+* *content* — the HTML content of the pop-up window.
+
+It is also possible to set the additional options for a pop-up window by passing an instance of a `PopupWindowOptions` class, which contains the following parameters:
+
+* *closeButtonEnabled* — whether the close button is enabled in a pop-up window.
+* *closeOnClick* — whether pop-up should be closed when a user clicks on the map.
+* *maxWidth* — max width of the pop-up, in pixels (default: 300).
+* *minWidth* — min width of the pop-up, in pixels (default: 50).
+
+It is possible to attach a pop-up window to a geometry. The pop-up window will be opened when a user clicks on the geometry on a map.
+
+In case of Canvas geometries, you can specify pop-up window in this way:
+
+[source,java]
+----
+ CanvasLayer.Point location = canvasLayer.addPoint(address.getLocation());
+    PopupWindowOptions popupWindowOptions = new PopupWindowOptions()
+                .setCloseOnClick(true)
+                .setMaxWidth(400);
+    location.setPopupContent(address.getName())
+            .setPopupOptions(popupWindowOptions);
+----
+
+In case of `VectorLayer`, you can specify a `popupContentProvider`, which is a function that generates content for each geo-object's pop-up window based on some geo-object parameters.
+
+It can be performed declaratively using the `@Install` annotation in a screen controller, for example:
+
+[source,java]
+----
+ @Install(to = "map.salespersonLayer", subject = "popupContentProvider")
+    private String salespersonLayerPopupContentProvider(Salesperson salesperson) {
+        return String.format(
+                "<b>Name: </b> %s " +
+                        "<p>" +
+                        "<b>Phone: </b> %s",
+                salesperson.getName(),
+                salesperson.getPhone());
+    }
+----
 
 [[maps-api]]
+[appendix]
 == Maps API
 
-=== GeoMap UI component
+*GeoMap UI component*
+
 The `GeoMap` UI component displays a map. The map is built by superposing multiple layers.
 
 *`GeoMap` methods*:
@@ -455,7 +598,7 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
     * `Layer getSelectedLayer()` — returns the selected layer of the map.
     * `addHeatMap(Map<Point, Double>)` — adds a heatmap to the map.
     * `addHeatMap(Map<Point, Double>, HeatMapOptions)` — adds a heatmap to the map with the additional options.
-    * `void openPopup(PopupWindow)` — opens a popup info window.
+    * `void openPopup(PopupWindow)` — opens a pop-up info window.
 
 
 *`GeoMap` events*:
@@ -469,32 +612,32 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
     * `LayerRemovedEvent` — event fired after removing a layer from a map.
     * `SelectedLayerChangedEvent` — event fired after changing the map's selected layer.
 
-=== Layers
+*Layers*
 
 *`TileLayer` methods*:
 
-    * `void setUrl(String)` — sets URL-pattern of a tile server.
+    * `void setUrl(String)` — sets URL pattern of a tile server.
     * `void setAttributionString(String)` — sets attribution string.
     * `void setOpacity(Double)` — sets tiles opacity value in the range between 0.0 (fully transparent) to 1.0 (fully opaque).
 
 
 *`WMSTileLayer` methods*:
 
-    * `void setUrl(String)` — sets URL of a WMS-service.
+    * `void setUrl(String)` — sets URL of a WMS service.
     * `void setOpacity(Double)` — sets tiles opacity value in the range between 0.0 (fully transparent) to 1.0 (fully opaque).
     * `void setCrs(CRS)` — sets CRS to be used in the WMS.
-    * `void setLayers(String)` — sets WMS-service layers to display on a map (as a comma-separated list).
+    * `void setLayers(String)` — sets WMS service layers to display on a map (as a comma-separated list).
     * `void setStyles(String)` — sets comma-separated list of WMS styles.
     * `void setFormat(String)` — sets WMS image format.
     * `void setTransparent(boolean)` — sets whether the layer is to be transparent.
-    * `void setVersion(String)` — sets WMS-service version.
+    * `void setVersion(String)` — sets WMS service version.
 
 
 *`VectorLayer` methods*:
 
-    * `void setStyleProvider(Function<? super T, GeometryStyle>)` — sets a function that determines geometry style for a given geo object. In CUBA 7.0 screens you can perform this declaratively using the `@Install` annotation in the screen controller.
+    * `void setStyleProvider(Function<? super T, GeometryStyle>)` — sets a function that determines geometry style for a given geo-object. In CUBA 7.0 screens you can perform this declaratively using the `@Install` annotation in the screen controller.
 
-    * `setPopupContentProvider(Function<? super T, String>)` — sets a function that determines content for bound popups which will be opened by clicking on geo objects on a map. In CUBA 7 screens you can perform this declaratively using the @Install annotation in the screen controller, for example:
+    * `setPopupContentProvider(Function<? super T, String>)` — sets a function that determines content for bound pop-ups which will be opened by clicking on geo-objects on a map. In CUBA 7 screens you can perform this declaratively using the @Install annotation in the screen controller, for example:
 +
 [source,java]
 ----
@@ -504,13 +647,13 @@ return territory.getName();
 }
 ----
 
-    * `void setPopupWindowOptions(PopupWindowOptions)` — sets the explicit style parameters for geo object's bound popups.
-    * `void setSelectedGeoObject(T)` — sets the selected geo object of the layer.
+    * `void setPopupWindowOptions(PopupWindowOptions)` — sets the explicit style parameters for geo-object's bound pop-ups.
+    * `void setSelectedGeoObject(T)` — sets the selected geo-object of the layer.
 
 
 *`VectorLayer` events*:
 
-    * `GeoObjectSelectedEvent` — event fired when selected geo object has changed.
+    * `GeoObjectSelectedEvent` — event fired when selected geo-object has changed.
 
 
 *`CanvasLayer` methods*:
@@ -533,8 +676,8 @@ return territory.getName();
     * `com.vividsolutions.jts.geom.Geometry getGeometry()` — returns the geometry value.
     * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
     * `setStyle(PointStyle)` — applies a style to the point.
-    * `setPopupContent(String)` — adds a popup window to be opened as user clicks on the point.
-    * `setPopupOptions(PopupWindowOptions)` — specifies options for a popup window added by previous method.
+    * `setPopupContent(String)` — adds a pop-up window to be opened as user clicks on the point.
+    * `setPopupOptions(PopupWindowOptions)` — specifies options for a pop-up window added by previous method.
 
 
 *`CanvasLayer.Point` events*:
@@ -550,8 +693,8 @@ return territory.getName();
     * `com.vividsolutions.jts.geom.Geometry getGeometry()` — returns the geometry value.
     * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
     * `setStyle(PolylineStyle)` — applies a style to the polyline.
-    * `setPopupContent(String)` — adds a popup window to be opened as user clicks on the polyline.
-    * `setPopupOptions(PopupWindowOptions)` — specifies options for a popup window added by previous method.
+    * `setPopupContent(String)` — adds a pop-up window to be opened as user clicks on the polyline.
+    * `setPopupOptions(PopupWindowOptions)` — specifies options for a pop-up window added by previous method.
 
 
 *`CanvasLayer.Polyline` events*:
@@ -567,8 +710,8 @@ return territory.getName();
     * `com.vividsolutions.jts.geom.Geometry getGeometry()` — returns the geometry value.
     * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
     * `setStyle(PolygonStyle)` — applies a style to the polygon.
-    * `setPopupContent(String)` — adds a popup window to be opened as user clicks on the polygon.
-    * `setPopupOptions(PopupWindowOptions)` — specifies options for a popup window added by previous method.
+    * `setPopupContent(String)` — adds a pop-up window to be opened as user clicks on the polygon.
+    * `setPopupOptions(PopupWindowOptions)` — specifies options for a pop-up window added by previous method.
 
 
 *`CanvasLayer.Polygon` events*:
@@ -579,4 +722,43 @@ return territory.getName();
 
 You can subscribe to events fired by a particular canvas geometry or you can subscribe to events fired by all points, polylines or polygons using the `CanvasLayer` interface.
 
-For more detailed information about the methods and parameters of addon's classes, please refer to the corresponding JavaDocs.
+
+[appendix]
+= Glossary
+
+[[appendix-b-web-map-service,Web Map Service]]
+*Web Map Service*
+
+Web Map Service (WMS) is an http://www.opengeospatial.org/[OGC] standard for serving up map images over HTTP. Map images are usually generated by a map server using data from GIS database. This format is similar to map tiles, but more general and not so well optimized for using in web applications.
+
+WMS supports a number of different request types, but the main operations are:
+
+* *GetCapabilities* — operation that returns an XML document describing the service (supported parameters, image formats, available layers, etc.).
+* *GetMap*  — operation that returns a map image for a specified area and content. The add-on uses this operation to obtain images from WMS.
+
+It's important not to confuse the concept of the add-on's layer with the layer in WMS. WMS provides a set of layers defined in the `GetCapabilities` XML document. The WMS Layer of the add-on displays the resulting images provided by WMS. These images are being built using one or more layers in WMS.
+
+The add-on does not work with *GetCapabilities* operation, so you can find out the information about the available layers in WMS in one of the following ways:
+
+* Find it in `GetCapabilities` XML document. You can obtain it by sending a URL request to the server and get the response as an XML document. The URL request looks like this: `BASE_WMS_URL?request=GetCapabilities`.
+* Use a GIS software (such as https://qgis.org/en/site/[QGIS]). http://www.qgistutorials.com/en/docs/working_with_wms.html[Here] is a tutorial on how to work with WMS in QGIS.
+
+Useful links:
+
+* OSM WMS Servers.
+
+[[appendix-b-xyz-tiles,XYZ tiles]]
+*XYZ tiles*
+
+In fact, XYZ is a  OpenStreetMap standard, also known as https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames[Slippy Map Tilenames], defining scheme for tiles that are served through a web server.
+
+These tiles can be accessed via URL following certain pattern: `http://.../{z}/{x}/{y}.png`, where `z` is the zoom level, and `x`,`y` identify the tile.
+
+For example, https://www.openstreetmap.org/[OpenStreetMap] tiles URL pattern is: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`.
+
+Useful links:
+
+* https://wiki.openstreetmap.org/wiki/Tile_servers[Tile servers] based on OpenStreetMap data.
+* https://leaflet-extras.github.io/leaflet-providers/preview/[Tile providers preview] — here you can find and preview various XYZ tile services. Some of them are free, while others require registration and may have free tile requests limit. Be sure to check the providers usage policies before using them.
+* https://docs.mapbox.com/api/maps/[Mapbox] tile API.
+* https://developer.here.com/documentation/map-tile/topics/quick-start-map-tile.html[HERE] tile API.
