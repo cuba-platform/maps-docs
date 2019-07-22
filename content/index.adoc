@@ -167,13 +167,13 @@ private GeoMap map;
 
 @Subscribe
 protected void onBeforeShow(BeforeShowEvent event) {
-map.setCenter(-99.755859D, 39.164141D);
-map.setZoomLevel(4);
+    map.setCenter(-99.755859D, 39.164141D);
+    map.setZoomLevel(4);
 
-TileLayer tileLayer = new TileLayer();
-   tileLayer.setUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-   tileLayer.setAttributionString("&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors");
-   map.addLayer(tileLayer);
+    TileLayer tileLayer = new TileLayer();
+    tileLayer.setUrl("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+    tileLayer.setAttributionString("&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors");
+    map.addLayer(tileLayer);
 }
 ----
 
@@ -227,7 +227,7 @@ Raster layers consist of raster images which is a grid of pixels. Raster layer i
 
 ===== Tile Layer
 
-`TileLayer` is used to load and display tiles that are served through a web server with URL like `http://.../{z}/{x}/{y}.png`. For example, https://www.openstreetmap.org[OpenStreetMap] tiles URL pattern is: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`.
+`TileLayer` is used to load and display tiles that are served through a web server with URL like `http://.../{z}/{x}/{y}.png`. Such tiles are usually referred as <<appendix-b-xyz-tiles>>.For example, https://www.openstreetmap.org[OpenStreetMap] tiles URL pattern is: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`.
 
 To add a tile layer on a map declare it in the XML descriptor:
 
@@ -371,7 +371,7 @@ To make the layer editable add the `editable` parameter:
 [source,xml]
 ----
 <maps:geoMap id="map">
-  <maps:layers>
+  <maps:layers selectedLayer="orderLayer">
     <maps:vector id="orderLayer" dataContainer="orderDc" editable="true"/>
   </maps:layers>
 </maps:geoMap>
@@ -397,6 +397,8 @@ private GeometryStyle territoryLayerStyleProvider(Territory territory) {
                .setStrokeWeight(1);
     }
 ----
+
+Classes for geometry style are included in the `com.haulmont.addon.maps.web.gui.components.layer.style` package.
 
 Geo-objects can be selected by user click or automatically from the associated data container. 
 
@@ -436,7 +438,7 @@ To draw *a point* just click on the map.
 
 image::point.png[]
 
-For drawing *a polyline* or *a polygon* specify the firs point and continue clicking on the map. To stop drawing click the last point twice.
+For drawing *a polyline* or *a polygon* specify the firs point and continue clicking on the map. To stop drawing click the last added point.
 
 image::line.png[]
 
@@ -750,7 +752,7 @@ Useful links:
 [[appendix-b-xyz-tiles,XYZ tiles]]
 *XYZ tiles*
 
-In fact, XYZ is a  OpenStreetMap standard, also known as https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames[Slippy Map Tilenames], defining scheme for tiles that are served through a web server.
+XYZ is a de facto OpenStreetMap standard, also known as https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames[Slippy Map Tilenames], defining scheme for tiles that are served through a web server.
 
 These tiles can be accessed via URL following certain pattern: `http://.../{z}/{x}/{y}.png`, where `z` is the zoom level, and `x`,`y` identify the tile.
 
