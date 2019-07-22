@@ -1,4 +1,5 @@
-# Maps Addon Documentation
+
+[Maps Add-on](https://git.haulmont.com/app-components/maps-addon) documentation.
 
 To build the documentation use the `asciidoctor` gradle task:
 
