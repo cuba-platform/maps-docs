@@ -302,9 +302,9 @@ Geo-object is an entity having a property of a geometry type. This property shou
 
 |===
 | *Datatype* | *Java type*
-| GeoPoint         | com.vividsolutions.jts.geom.Point
-| GeoPolyline      | com.vividsolutions.jts.geom.LineString
-| GeoPolygon       | com.vividsolutions.jts.geom.Polygon
+| GeoPoint         | org.locationtech.jts.geom.Point
+| GeoPolyline      | org.locationtech.jts.geom.LineString
+| GeoPolygon       | org.locationtech.jts.geom.Polygon
 |===
 
 To add the property:
@@ -342,7 +342,7 @@ public class Address extends StandardEntity {
 }
 ----
 
-As you can see, `Address` is a simple entity, one of which properties `location` is of a `com.vividsolutions.jts.geom.Point` type.
+As you can see, `Address` is a simple entity, one of which properties `location` is of a `org.locationtech.jts.geom.Point` type.
 
 
 ==== Adding Vector Layers
@@ -660,9 +660,9 @@ return territory.getName();
 
 *`CanvasLayer` methods*:
 
-    * `CanvasLayer.Point addPoint(com.vividsolutions.jts.geom.Point)` — adds a point to the canvas.
-    * `CanvasLayer.Polyline addPolyline(com.vividsolutions.jts.geom.LineString)` — adds a polyline to the canvas.
-    * `CanvasLayer.Polygon addPolygon(com.vividsolutions.jts.geom.Polygon)` — adds a polyline to the canvas.
+    * `CanvasLayer.Point addPoint(org.locationtech.jts.geom.Point)` — adds a point to the canvas.
+    * `CanvasLayer.Polyline addPolyline(org.locationtech.jts.geom.LineString)` — adds a polyline to the canvas.
+    * `CanvasLayer.Polygon addPolygon(org.locationtech.jts.geom.Polygon)` — adds a polyline to the canvas.
     * `void removePoint(CanvasLayer.Point)` — removes a point from the canvas.
     * `void removePolyline(CanvasLayer.Polyline)` — removes a polyline from the canvas.
     * `void removePolygon(CanvasLayer.Polygon)` — removes a polygon from the canvas.
@@ -675,7 +675,7 @@ return territory.getName();
 
 *`CanvasLayer.Point` methods*:
 
-    * `com.vividsolutions.jts.geom.Geometry getGeometry()` — returns the geometry value.
+    * `org.locationtech.jts.geom.Geometry getGeometry()` — returns the geometry value.
     * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
     * `setStyle(PointStyle)` — applies a style to the point.
     * `setPopupContent(String)` — adds a pop-up window to be opened as user clicks on the point.
@@ -692,7 +692,7 @@ return territory.getName();
 
 *`CanvasLayer.Polyline` methods*:
 
-    * `com.vividsolutions.jts.geom.Geometry getGeometry()` — returns the geometry value.
+    * `org.locationtech.jts.geom.Geometry getGeometry()` — returns the geometry value.
     * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
     * `setStyle(PolylineStyle)` — applies a style to the polyline.
     * `setPopupContent(String)` — adds a pop-up window to be opened as user clicks on the polyline.
@@ -709,7 +709,7 @@ return territory.getName();
 
 *`CanvasLayer.Polygon` methods*:
 
-    * `com.vividsolutions.jts.geom.Geometry getGeometry()` — returns the geometry value.
+    * `org.locationtech.jts.geom.Geometry getGeometry()` — returns the geometry value.
     * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
     * `setStyle(PolygonStyle)` — applies a style to the polygon.
     * `setPopupContent(String)` — adds a pop-up window to be opened as user clicks on the polygon.
