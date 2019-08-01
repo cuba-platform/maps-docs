@@ -430,7 +430,7 @@ This value will be used when calculating the summed up value of the cluster (by 
 * *disableAtZoom* — specifies a zoom level from which clustering will be disabled.
 * *showSinglePointAsCluster* — show single point as a cluster of 1 size.
 
-==== Drawing Geometry 
+=== Drawing Geometry 
 
 Open a screen containing a map with an editable `VectorLayer`.
 
@@ -448,7 +448,7 @@ image::polygon1.png[]
 
 To delete a geometry right-click and select *Clear geometry*.
 
-==== Using Canvas Layer
+=== Using Canvas Layer
 
 `CanvasLayer` is a utility layer belonging to a map by default. This layer is used to draw and display geometries on a map. It is similar to `VectorLayer` since they both display vector geometries. The difference is that `VectorLayer` works with geo-objects while `CanvasLayer` works just with geometries.
 It makes the task of displaying some geometry on a map really straightforward so there is no need to store data in an entity.
@@ -506,9 +506,9 @@ You can also specify the selected layer in the XML descriptor:
 
 See more `CanvasLayer` methods and events in <<maps-api>>.
 
-==== Additional Options
+=== Additional Options
 
-===== Heatmaps
+==== Heatmaps
 
 Heatmaps provide a visual representation of data density across a set of geographical points.
 
@@ -527,7 +527,7 @@ Class `HeatMapOptions` contains various options for a heatmap:
  * *minOpacity* — the minimum opacity the heat will start at (default: 0.05).
  * *maxZoom* — the zoom level where the points reach maximum intensity (as intensity scales with zoom). By default, equals the maxZoom of a map.
 
-===== Pop-up Window
+==== Pop-up Window
 
 The add-on provides an ability to display some information in a pop-up window on a map.
 
