@@ -48,39 +48,58 @@ See https://github.com/cuba-platform/maps-addon-demo[sample application], using 
 
 == Installation
 
-The beta version of the Maps add-on is distributed with a free trial period up to September 1, 2019.
+To install the release version of the component in your project you need to add premium repository and then install the add-on.
 
-To install the beta version of the component in your project, do the following steps:
+=== Adding Repository
 
-1. Download a ZIP archive that contains add-on artifacts by the http://download.cuba-platform.com/artifacts/maps-addon-alpha[link].
-+
-2. Put the artifacts to the local maven repository: `~/.m2/repository/…` . You should have a files structure like this:    
-+
-[source]
-----
-user_home_directory    
- .m2    
-   repository    
-    com    
-     haulmont    
-      addon    
-       maps`   
-        ...
-----
-+
-3. Open your project that uses the platform version 7.0.x in CUBA Studio.
-+
-4. Open *Project Properties* and select *Use local Maven repository* check box.
+1. Open your application in CUBA Studio.
+
+2. Double-click *Properties* in the CUBA project tree.
 +
 image::properties.png[]
 +
-5. On the *App components* panel click the *Plus* button next to *Custom components*.
+3. Click the *Plus* button in the *Repositories* section.
 +
-6. Paste the coordinates `com.haulmont.addon.maps:maps-global:0.1.alpha` in the corresponding field.
+image::repository.png[]
 +
-image::coordinates.png[]
+4. Specify the repository URL:
 +
-7. Click *OK* to confirm and save project properties.
+ * https://repo.cuba-platform.com/content/groups/premium, if the main repository is repo.cuba-platform.com
+ * https://cuba-platform.bintray.com/premium, if the main repository is Bintray
++
+and enter your credentials in the corresponding fields. The first part of your license key before dash is the repository user name, the part after dash is the password. For example, if your key is `111111222222-abcdefabcdef`, then the user name is `111111222222` and the password is `abcdefabcdef`. Click OK to save the changes.
++
+image::credentials.png[]
++
+Click *OK* to save the changes.
++
+Also, you can add the repository by editing `build.gradle` file. The configuration steps are described in https://doc.cuba-platform.com/manual-latest/access_to_repo.html#access_to_premium_repo[Developer's Manual].
++ 
+5. Select the added repository in the list of repositories to use it in your project.
++
+image::properties2.png[]
++
+6. Click *OK* to save the project properties.
+
+=== Adding Component
+
+1. Double-click *Add-ons* in the CUBA project tree.
++
+image::marketplace.png[]
++
+2. Select *Marketplace* tab and find *Maps* add-on.
++
+image::maps-addon.png[]
++
+3. Click *Install* button and confirm that you have a subscription in the appeared dialog.
++
+image::subscription.png[]
++
+4. Click *Apply & Close* button and then *Continue* in the dialog.
++
+image::continue.png[]
+
+*Maps* add-on will be installed in your project.
 
 == Components Compatibility
 
