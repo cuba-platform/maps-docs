@@ -67,7 +67,7 @@ image::repository.png[]
  * https://repo.cuba-platform.com/content/groups/premium, if the main repository is repo.cuba-platform.com
  * https://cuba-platform.bintray.com/premium, if the main repository is Bintray
 +
-and enter your credentials in the corresponding fields. The first part of your license key before dash is the repository user name, the part after dash is the password. For example, if your key is `111111222222-abcdefabcdef`, then the user name is `111111222222` (for Bintray repository add `@cuba-platform` to the user name, example `111111222222@cuba-platform`) and the password is `abcdefabcdef`. Click OK to save the changes.
+and enter your credentials in the corresponding fields. The first part of your license key before dash is the repository user name, the part after dash is the password. For example, if your key is `111111222222-abcdefabcdef`, then the user name is `111111222222` (for Bintray repository add `@cuba-platform` to the user name, for example `111111222222@cuba-platform`) and the password is `abcdefabcdef`. Click OK to save the changes.
 +
 image::credentials.png[]
 +
