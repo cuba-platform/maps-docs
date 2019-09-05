@@ -19,10 +19,10 @@
 :revremark: Copyright (c) 2019 Haulmont (www.haulmont.com)
 :idea-version: 2018.3
 :version-label: Version
-:plugin-version: 7.0
-:main_man_url: https://doc.cuba-platform.com/manual-7.0
-:rel_notes_url: http://files.cuba-platform.com/cuba/release-notes/7.0
-:revnumber: 7.0
+:plugin-version: 1.1
+:main_man_url: https://doc.cuba-platform.com/manual-7.1
+:rel_notes_url: http://files.cuba-platform.com/cuba/release-notes/7.1
+:revnumber: 1.1
 :sectnums:
 
 == Overview
@@ -404,7 +404,7 @@ VectorLayer<Order> orderLayer = new VectorLayer<>("orderLayer", new ContainerVec
 map.addLayer(orderLayer);
 ----
 
-To determine geometry style for geo-objects use `setStyleProvider()` method. In CUBA 7.0 screens you can perform this declaratively using the `@Install` annotation in the screen controller, for example:
+To determine geometry style for geo-objects use `setStyleProvider()` method. In CUBA 7.0+ screens you can perform this declaratively using the `@Install` annotation in the screen controller, for example:
 [source,java]
 ----
 @Install(to = "map.territoryLayer", subject = "styleProvider")
@@ -656,7 +656,7 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
 
 *`VectorLayer` methods*:
 
-    * `void setStyleProvider(Function<? super T, GeometryStyle>)` — sets a function that determines geometry style for a given geo-object. In CUBA 7.0 screens you can perform this declaratively using the `@Install` annotation in the screen controller.
+    * `void setStyleProvider(Function<? super T, GeometryStyle>)` — sets a function that determines geometry style for a given geo-object. In CUBA 7.0+ screens you can perform this declaratively using the `@Install` annotation in the screen controller.
 
     * `setPopupContentProvider(Function<? super T, String>)` — sets a function that determines content for bound pop-ups which will be opened by clicking on geo-objects on a map. In CUBA 7 screens you can perform this declaratively using the @Install annotation in the screen controller, for example:
 +
