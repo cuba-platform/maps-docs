@@ -52,35 +52,41 @@ See https://github.com/cuba-platform/maps-addon-demo[sample application], using 
 
 In case you've got a trial version of the add-on and have a ZIP file with artifacts, follow the instructions:
 
-1. Go to the user's home directory and create `.m2` folder if it doesn't exist. It is your local Maven repository. 
+1. Go to the user's home directory and create `.m2` folder if it doesn't exist. It is your local Maven repository. Default home directory for operation system:
++
+* Windows - `<root>\Users\<username>`
+* Unix-based - `<root>/home/<username>`
+* macOS - `/Users/<username>`
++
+2. Create folder `repository` in `.m2`.
 
-2. Unzip the file with artifacts into this directory. You should get the following directory structure:
+3. Unzip the file with artifacts into this directory. You should get the following directory structure:
 +
 image::structure.png[]
 +
-3. Double-click *Properties* in CUBA project tree. 
+4. Double-click *Properties* in CUBA project tree. 
 +
 image::properties.png[]
 +
-4. Select the *Use local Maven repository* checkbox and apply the changes.
+5. Select the *Use local Maven repository* checkbox and apply the changes.
 
-5. Go to *CUBA -> Marketplace* in the main menu.
+6. Go to *CUBA -> Marketplace* in the main menu.
 +
 image::main-menu.png[]
 +
-6. Click the *Gear* icon in the upper-right corner, then *Install by coordinates…*
+7. Click the *Gear* icon in the upper-right corner, then *Install by coordinates…*
 +
 image::gear.png[]
 +
-7. Enter coordinates of the latest add-on version. Copy coordinates from the *Component Coordinates* section on the page of the add-on on the https://www.cuba-platform.com/marketplace/[marketplace]. 
+8. Enter coordinates of the latest add-on version. Copy coordinates from the *Component Coordinates* section on the page of the add-on on the https://www.cuba-platform.com/marketplace/[marketplace]. 
 +
 image::copy-coordinates.png[]
 +
-8. Add `.trial` at the end of the coordinates, for example:
+9. Add `.trial` at the end of the coordinates, for example:
 +
 image::coordinates1.png[]
 +
-9. Click *OK* and *Apply*. The installation will start.
+10. Click *OK* and *Apply*. The installation will start.
 
 === Installation of Purchased Add-on
 
