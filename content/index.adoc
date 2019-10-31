@@ -12,7 +12,7 @@
 :sourcesdir: ../../source
 :doctype: book
 :docinfo: private
-:docinfodir: ../../docinfo
+:docinfodir: ../docinfo
 :sectlinks:
 :sectanchors:
 :lang: en
@@ -44,7 +44,7 @@ Key features:
 
 * Provides features for geoanalysis: heatmaps and clustering.
 
-See https://github.com/cuba-platform/maps-addon-demo[sample application], using this component.
+See https://github.com/cuba-platform/maps-addon-demo[sample application] using this component.
 
 == Installation
 
@@ -74,7 +74,7 @@ image::credentials.png[]
 Click *OK* to save the changes.
 +
 Also, you can add the repository by editing `build.gradle` file. The configuration steps are described in https://doc.cuba-platform.com/manual-latest/access_to_repo.html#access_to_premium_repo[Developer's Manual].
-+ 
++
 5. Select the added repository in the list of repositories to use it in your project.
 +
 image::properties2.png[]
@@ -419,7 +419,7 @@ private GeometryStyle territoryLayerStyleProvider(Territory territory) {
 
 Classes for geometry style are included in the `com.haulmont.addon.maps.web.gui.components.layer.style` package.
 
-Geo-objects can be selected by user click or automatically from the associated data container. 
+Geo-objects can be selected by user click or automatically from the associated data container.
 
 `setSelectedGeoObject()` method sets the geo-object which the layer is focused on. For example, if an entity is opened in an editor screen it will be implicitly selected in a corresponding vector layer.
 
@@ -449,7 +449,7 @@ This value will be used when calculating the summed up value of the cluster (by 
 * *disableAtZoom* — specifies a zoom level from which clustering will be disabled.
 * *showSinglePointAsCluster* — show single point as a cluster of 1 size.
 
-=== Drawing Geometry 
+=== Drawing Geometry
 
 Open a screen containing a map with an editable `VectorLayer`.
 
@@ -457,7 +457,7 @@ To draw *a point* just click on the map.
 
 image::point.png[]
 
-For drawing *a polyline* or *a polygon* specify the firs point and continue clicking on the map. To stop drawing click the last added point.
+For drawing *a polyline* or *a polygon* specify the first point and continue clicking on the map. To stop drawing click the last added point.
 
 image::line.png[]
 
@@ -656,7 +656,7 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
 
 *`VectorLayer` methods*:
 
-    * `void setStyleProvider(Function<? super T, GeometryStyle>)` — sets a function that determines geometry style for a given geo-object. In CUBA 7.0 screens you can perform this declaratively using the `@Install` annotation in the screen controller.
+    * `void setStyleProvider(Function<? super T, GeometryStyle>)` — sets a function that determines geometry style for a given geo-object. In CUBA 7.0+ screens you can perform this declaratively using the `@Install` annotation in the screen controller.
 
     * `setPopupContentProvider(Function<? super T, String>)` — sets a function that determines content for bound pop-ups which will be opened by clicking on geo-objects on a map. In CUBA 7 screens you can perform this declaratively using the @Install annotation in the screen controller, for example:
 +
