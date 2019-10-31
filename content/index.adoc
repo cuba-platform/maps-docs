@@ -64,7 +64,7 @@ In case you've got a trial version of the add-on and have a ZIP file with artifa
 +
 image::structure.png[]
 +
-4. Double-click *Properties* in CUBA project tree. 
+4. Double-click *Properties* in CUBA project tree.
 +
 image::properties.png[]
 +
@@ -78,7 +78,7 @@ image::main-menu.png[]
 +
 image::gear.png[]
 +
-8. Enter coordinates of the latest add-on version. Copy coordinates from the *Component Coordinates* section on the page of the add-on on the https://www.cuba-platform.com/marketplace/[marketplace]. 
+8. Enter coordinates of the latest add-on version. Copy coordinates from the *Component Coordinates* section on the page of the add-on on the https://www.cuba-platform.com/marketplace/[marketplace].
 +
 image::copy-coordinates.png[]
 +
