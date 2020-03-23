@@ -16,13 +16,13 @@
 :sectlinks:
 :sectanchors:
 :lang: en
-:revremark: Copyright (c) 2019 Haulmont (www.haulmont.com)
+:revremark: Copyright (c) 2020 Haulmont (www.haulmont.com)
 :idea-version: 2018.3
 :version-label: Version
-:plugin-version: 1.1
-:main_man_url: https://doc.cuba-platform.com/manual-7.1
-:rel_notes_url: http://files.cuba-platform.com/cuba/release-notes/7.1
-:revnumber: 1.1
+:plugin-version: 1.2
+:main_man_url: https://doc.cuba-platform.com/manual-7.2
+:rel_notes_url: http://files.cuba-platform.com/cuba/release-notes/7.2
+:revnumber: 1.2
 :sectnums:
 
 == Overview
@@ -45,6 +45,21 @@ Key features:
 * Provides features for geoanalysis: heatmaps and clustering.
 
 See https://github.com/cuba-platform/maps-addon-demo[sample application] using this component.
+
+[[release_notes]]
+== Release Notes
+
+[discrete]
+[[release_1_2_0]]
+=== Release 1.2.0
+
+. Optimized vector layers refreshing.
+. Added <<Tooltip,tooltips>> support.
+Tooltips are small text boxes that generally appear on hovering over geometries, but can be configured as permanent to be used as text labels picked to geometries.
+. Added new <<Point Icons,point icon>> type: `DivPointIcon` - a fully custom lightweight icon for points that uses a `<div>` element instead of an image. May be useful to display text label instead of the default point marker.
+. Added possibility to open pop-up windows and tooltips programmatically.
+. Fixed small bugs.
+
 
 == Installation
 
@@ -220,13 +235,13 @@ To add a layer on a map declare the `layers` element and its configuration in th
 
 [source,xml]
 ----
-   <maps:geoMap id="map" height="600px" width="100%">
-           <maps:layers selectedLayer="salespersonLayer">
-               <maps:tile id="tiles" tileProvider="maps_OpenStreetMap"/>
-               <maps:vector id="territoryLayer" dataContainer="territoryDc"/>
-               <maps:vector id="salespersonLayer" dataContainer="salespersonDc" editable="true"/>
-           </maps:layers>
-   </maps:geoMap>
+<maps:geoMap id="map" height="600px" width="100%">
+        <maps:layers selectedLayer="salespersonLayer">
+            <maps:tile id="tiles" tileProvider="maps_OpenStreetMap"/>
+            <maps:vector id="territoryLayer" dataContainer="territoryDc"/>
+            <maps:vector id="salespersonLayer" dataContainer="salespersonDc" editable="true"/>
+        </maps:layers>
+</maps:geoMap>
 ----
 
 `selectedLayer` is a layer which the map is focused on. Selected layer fires events, reacts on user clicks and can be modified by UI interaction in case the layer is editable.
@@ -267,7 +282,7 @@ To add a tile layer on a map declare it in the XML descriptor:
 
 `id` and `url` parameters are required.
 
-*Note* that the most tile servers require attribution, which you can set in `attribution` parameter. In our example the credit ©OpenStreetMap contributors will appear in the lower-right corner.
+TIP: The most tile servers require attribution, which you can set in `attribution` parameter. In our example the credit ©OpenStreetMap contributors will appear in the lower-right corner.
 
 In order not to clutter the XML descriptors with the URL and attribution strings:
 
@@ -344,9 +359,10 @@ image::geotypes.png[]
 +
 * `@Geometry` — marks that the property is to be used when displaying the geo-object on a map.
 +
-*Note*: geo-object must have one geometry property, otherwise an exception will be thrown when drawing the layer.
+TIP: Geo-object must have one geometry property, otherwise an exception will be thrown when drawing the layer.
 +
-* `@Convert` — specifies a JPA converter defining how the datatype will be persisted. JPA converters for the component's datatypes are included in the package: `com.haulmont.addon.maps.gis.converters`.
+* `@Convert` — specifies a JPA converter defining how the datatype will be persisted. JPA converters for the component datatypes are included in the package: `com.haulmont.addon.maps.gis.converters`.
+
 The current version of the component includes converters that transform coordinates into the https://en.wikipedia.org/wiki/Well-known_text[WKT]
 format which consequently persists as a text.
 While loading from DB this text will be parsed back into the objects.
@@ -404,6 +420,8 @@ To make the layer editable add the `editable` parameter:
 </maps:geoMap>
 ----
 
+TIP: To edit/draw geometries on the editable vector layer, the layer should be selected on the map.
+
 Additionally you can create `VectorLayer` in the screen controller:
 
 [source,java]
@@ -422,7 +440,7 @@ private GeometryStyle territoryLayerStyleProvider(Territory territory) {
                .setStrokeColor("#004912")
                .setFillOpacity(0.3)
                .setStrokeWeight(1);
-    }
+}
 ----
 
 Classes for geometry style are included in the `com.haulmont.addon.maps.web.gui.components.layer.style` package.
@@ -432,6 +450,101 @@ Geo-objects can be selected by user click or automatically from the associated d
 `setSelectedGeoObject()` method sets the geo-object which the layer is focused on. For example, if an entity is opened in an editor screen it will be implicitly selected in a corresponding vector layer.
 
 See more `VectorLayer` methods in <<maps-api>>.
+
+===== Working with a Collection of Geo-objects
+
+To display a collection of geo-objects, add a `VectorLayer` with a bound `CollectionContainer` to a map:
+
+[source,xml]
+----
+<maps:geoMap id="map">
+  <maps:layers>
+    ...
+    <maps:vector id="territoriesLayer" dataContainer="territoriesDc"/>
+  </maps:layers>
+</maps:geoMap>
+----
+
+`VectorLayer` is subscribed to changes in the corresponding data container and automatically refreshes when new items are added to the data container or in case of removing items from the container.
+
+If `VectorLayer` is set as selected, it becomes interactive, which means a user can select a geo-object by clicking on it.
+
+[source,xml]
+----
+<maps:geoMap id="map">
+  <maps:layers selectedLayer="territoriesLayer">
+    ...
+    <maps:vector id="territoriesLayer" dataContainer="territoriesDc"/>
+  </maps:layers>
+</maps:geoMap>
+----
+
+Selecting a geo-object produces the `GeoObjectSelectedEvent`. You can subscribe to this event in the screen controller, for example, to select the geo-object in a table as well:
+
+[source,java]
+----
+@Subscribe("map.territoriesLayer")
+private void onTerritorySelected(VectorLayer.GeoObjectSelectedEvent<Territory> event) {
+    territoriesTable.setSelected(event.getItem());
+}
+----
+
+The geometry of a geo-object can be interactively modified if the layer is set as editable. First, you need to select the geo-object via UI by clicking on it, or programmatically by calling the `setSelectedGeoObject` method of the `VectorLayer`. After that the geometry of the selected geo-object can be edited in one of the ways described below:
+
+* if the geometry value is *null* (the geo-object is not displayed on the map), then the map turns into the drawing mode (the cursor becomes crosshair) and you can draw a geometry as described <<Drawing Geometry, here>>.
+* if the geometry value is *not null*, then the geometry turns into the editable mode (point icons become draggable, polylines and polygons show small white squares) and you can modify or remove the geometry.
+
+Interactive adding a new geo-object to a vector layer can be implemented in two ways:
+
+1. By adding a new geo-object instance to the data container and selecting it:
++
+[source,java]
+----
+private void addTerritory() {
+    VectorLayer<Territory> territoriesLayer = map.getLayer("territoriesLayer");
+    Territory territory = dataContext.create(Territory.class);
+    territoriesDc.getMutableItems().add(territory);
+    territoriesLayer.setSelectedGeoObject(territory);
+}
+----
++
+The drawback of this method is that it adds a new geo-object instance every time the method is called, even if the geometry hasn't been drawn. It can be worked around by using a temporary geo-object variable and checking whether the geometry was set to the previously created instance:
++
+[source,java]
+----
+private Territory newTerritory;
+
+private void addTerritory() {
+    VectorLayer<Territory> territoriesLayer = map.getLayer("territoriesLayer");
+    if (newTerritory == null || newTerritory.getPolygon() != null) {
+        Territory territory = dataContext.create(Territory.class);
+        territoriesDc.getMutableItems().add(territory);
+        newTerritory = territory;
+    }
+    territoriesLayer.setSelectedGeoObject(newTerritory);
+}
+----
+2. Using <<Using Canvas Layer, CanvasLayer>> to draw a geometry:
++
+[source,java]
+----
+private void addTerritory() {
+    VectorLayer<Territory> territoriesLayer = map.getLayer("territoriesLayer");
+    CanvasLayer canvas = map.getCanvas();
+    map.selectLayer(canvas);
+
+    canvas.drawPolygon(polygon -> {
+        Territory territory = dataContext.create(Territory.class);
+        territory.setPolygon((Polygon) polygon.getGeometry());
+        territoriesDc.getMutableItems().add(territory);
+        territoriesLayer.setSelectedGeoObject(territory);
+        canvas.removePolygon(polygon);
+        map.selectLayer(territoriesLayer);
+    });
+}
+----
++
+With this approach, the geo-object is created only after the geometry has been drawn.
 
 ===== Clustering
 
@@ -457,6 +570,36 @@ This value will be used when calculating the summed up value of the cluster (by 
 * *disableAtZoom* — specifies a zoom level from which clustering will be disabled.
 * *showSinglePointAsCluster* — show single point as a cluster of 1 size.
 
+===== Working with Underlying Vaadin Components of Geo-objects
+
+For each geo-object displayed on a map the add-on creates an instance of the `com.haulmont.addon.maps.web.gui.components.leaflet.translators.GeoObjectWrapper` class that keeps the underlying Vaadin Component. This class provides methods to work directly with the wrapped component:
+
+ - `openPopup()` - opens the pop-up window of the geo-object, if the pop-up content is specified.
+ - `closePopup()` - closes the pop-up window of the geo-object.
+ - `openTooltip()` - opens the tooltip of the geo-object, if the tooltip content is specified.
+ - `closeTooltip()` - closes the tooltip of the geo-object.
+ - `getLeafletComponent()` - returns the underlying Vaadin Component (connected with the Leaflet component on the client side).
+
+To obtain geo-object wrappers for a vector layer invoke the `getGeoObjectWrappersMap()` method of the `WebGeoMap` class (implementation of the `GeoMap`) and pass the layer to it:
+
+[source,java]
+----
+VectorLayer<Territory> territoriesLayer = map.getLayer("territoriesLayer");
+Map<?, GeoObjectWrapper<Salesperson>> geoObjectWrappersMap =
+        ((WebGeoMap) map).getGeoObjectWrappersMap(territoriesLayer);
+----
+The returned map contains entries in which keys are geo-objects IDs and values are corresponding `GeoObjectWrapper` instances. So you can obtain `GeoObjectWrapper` of the particular geo-object this way:
+[source,java]
+----
+GeoObjectWrapper<Salesperson> geoObjectWrapper = geoObjectWrappersMap.get(salesperson.getId());
+if (geoObjectWrapper != null) {
+    geoObjectWrapper.openPopup();
+}
+----
+WARNING: If the geometry value of the geo-object is null, then there is no `GeoObjectWrapper` for this geo-object.
+
+Also, be aware that `GeoObjectWrapper` instances can be changed or replaced after refreshing the layer. So always use this map to get the relevant wrapper instance.
+
 === Drawing Geometry
 
 Open a screen containing a map with an editable `VectorLayer`.
@@ -469,7 +612,7 @@ For drawing *a polyline* or *a polygon* specify the first point and continue cli
 
 image::line.png[]
 
-To add a hole inside a polygon right-click and select *Add hole*. Start drawing a hole inside the poligon.
+To add a hole inside a polygon right-click and select *Add hole*. Start drawing a hole inside the polygon.
 
 image::polygon.png[]
 
@@ -514,11 +657,12 @@ You can also draw geometries on the canvas via UI. For example, to draw a point 
 [source,java]
 ----
 canvasLayer.drawPoint(point -> {
-    address.setLocation(point.getGeometry());
+    address.setLocation((Point) point.getGeometry());
 });
 ----
 
-*Note* that before drawing geometries via UI on the canvas you need to select the canvas on the map by calling `map.selectLayerById(CanvasLayer.ID)`.
+TIP: Before drawing geometries via UI on the canvas you need to select the canvas on the map by calling `map.selectLayerById(CanvasLayer.ID)`.
+
 You can also specify the selected layer in the XML descriptor:
 
 [source,xml]
@@ -590,16 +734,106 @@ It can be performed declaratively using the `@Install` annotation in a screen co
 
 [source,java]
 ----
- @Install(to = "map.salespersonLayer", subject = "popupContentProvider")
-    private String salespersonLayerPopupContentProvider(Salesperson salesperson) {
-        return String.format(
-                "<b>Name: </b> %s " +
-                        "<p>" +
-                        "<b>Phone: </b> %s",
-                salesperson.getName(),
-                salesperson.getPhone());
-    }
+@Install(to = "map.salespersonLayer", subject = "popupContentProvider")
+private String salespersonLayerPopupContentProvider(Salesperson salesperson) {
+    return String.format(
+            "<b>Name: </b> %s " +
+                    "<p>" +
+                    "<b>Phone: </b> %s",
+            salesperson.getName(),
+            salesperson.getPhone());
+}
 ----
+
+==== Tooltip
+
+In addition to pop-up windows, you can display small text in tooltips. Tooltips generally appear on hovering over geometries, but you can define them to be permanent, thereby using them as text labels picked to geometries:
+
+image::tooltip-labels.png[]
+
+In case of `VectorLayer`, you can specify the `tooltipContentProvider`, which is a function that generates content for each geo-object's tooltip based on some geo-object parameters.
+
+It can be performed declaratively using the `@Install` annotation in the screen controller, for example:
+
+[source,java]
+----
+@Install(to = "map.salespersonLayer", subject = "tooltipContentProvider")
+private String salespersonLayerTooltipContentProvider(Salesperson salesperson) {
+    return salesperson.getName();
+}
+----
+
+In case of Canvas geometries, you can specify tooltips this way:
+
+[source,java]
+----
+CanvasLayer.Point location = canvasLayer.addPoint(address.getLocation());
+TooltipOptions tooltipOptions = new TooltipOptions();
+tooltipOptions.setPermanent(true);
+tooltipOptions.setOpacity(0.7);
+location.setTooltipContent(address.getName())
+        .setTooltipOptions(tooltipOptions);
+----
+
+It is also possible to set additional options for a tooltip box by passing an instance of the `TooltipOptions` class, which contains the following parameters:
+
+* *direction* — defines where a tooltip opens in relation to the geometry: `right`, `left`, `top`, `bottom`, `center`, `auto`. The default value is `auto`). The `auto` value dynamically switches between `right` and `left` according to the geometry position on the map.
+* *permanent* — defines whether to open the tooltip permanently or only on mouseover. The default value is `false`.
+* *sticky* — if set to `true`, a tooltip will follow the mouse instead of being fixed at the feature center. The default value is `false`.
+* *interactive* — if set to `true`, a tooltip will accept mouse clicks. The default value is `false`.
+* *opacity* — tooltip box opacity. The default value is `0.9`.
+
+==== Point Icons
+
+Point style is defined by its icon. There are different kinds of icons:
+
+1. The default icon is a blue marker image and it is used when the style is not specified for a point.
+2. `FontPointIcon` looks like the default icon, but you can specify Font Awesome symbol inside it:
++
+[source,java]
+----
+@Install(to = "map.orderLayer", subject = "styleProvider")
+private GeometryStyle orderLayerStyleProvider(Order order) {
+    return new PointStyle(
+            new FontPointIcon(CubaIcon.SHOPPING_BASKET)
+                    .setIconPathFillColor("#0051d3"));
+}
+----
++
+image::font-icons.png[]
+3. `ImagePointIcon` allows you to use an image as an icon.
++
+[source,java]
+----
+@Install(to = "map.orderLayer", subject = "styleProvider")
+private GeometryStyle orderLayerStyleProvider(Order order) {
+    return new PointStyle(
+            new ImagePointIcon("classpath:/com/haulmont/demo/maps/web/cuba_icon.png")
+                    .setIconSize(33, 33));
+}
+----
+4. `DivPointIcon` is a fully custom lightweight icon that uses the `<div>` element instead of an image.
++
+For example, you can create an icon that combines an image with a text label:
++
+[source,java]
+----
+private String divElement = "<img src='https://cdn3.iconfinder.com/data/icons/business-avatar-1/512/3_avatar-128.png' width=60 height = 60/>\n" +
+            "<font color = 'green' face = 'arial' size = 2> <i>NAME</i></font>";
+
+@Install(to = "map.salespersonLayer", subject = "styleProvider")
+private GeometryStyle salespersonLayerStyleProvider(Salesperson salesperson) {
+    return new PointStyle(
+            new DivPointIcon(divElement.replaceAll("NAME", salesperson.getName()))
+                    .setStyles("my-div-style")
+                    .setPopupAnchor(30, 0));
+}
+----
+Points with this style look like this:
++
+image::div-icons.png[]
+
+To find out more about icons setting, please refer to the JavaDoc.
 
 [[maps-api]]
 [appendix]
@@ -649,7 +883,6 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
     * `void setAttributionString(String)` — sets attribution string.
     * `void setOpacity(Double)` — sets tiles opacity value in the range between 0.0 (fully transparent) to 1.0 (fully opaque).
 
-
 *`WMSTileLayer` methods*:
 
     * `void setUrl(String)` — sets URL of a WMS service.
@@ -677,6 +910,8 @@ return territory.getName();
 ----
 
     * `void setPopupWindowOptions(PopupWindowOptions)` — sets the explicit style parameters for geo-object's bound pop-ups.
+    * `void setTooltipContentProvider(Function<? super T, String>)` — sets a function that determines content for bound tooltips.
+    * `void setTooltipOptions(TooltipOptions)` — sets the explicit style parameters for geo-object's bound tooltips.
     * `void setSelectedGeoObject(T)` — sets the selected geo-object of the layer.
 
 
@@ -702,12 +937,11 @@ return territory.getName();
 
 *`CanvasLayer.Point` methods*:
 
-    * `org.locationtech.jts.geom.Geometry getGeometry()` — returns the geometry value.
-    * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
     * `setStyle(PointStyle)` — applies a style to the point.
     * `setPopupContent(String)` — adds a pop-up window to be opened as user clicks on the point.
     * `setPopupOptions(PopupWindowOptions)` — specifies options for a pop-up window added by previous method.
-
+    * `setTooltipContent(String)` — adds a tooltip to be opened as user hovers on the point.
+    * `setTooltipOptions(TooltipOptions)` — specifies options for a tooltip added by previous method.
 
 *`CanvasLayer.Point` events*:
 
@@ -719,12 +953,11 @@ return territory.getName();
 
 *`CanvasLayer.Polyline` methods*:
 
-    * `org.locationtech.jts.geom.Geometry getGeometry()` — returns the geometry value.
-    * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
     * `setStyle(PolylineStyle)` — applies a style to the polyline.
     * `setPopupContent(String)` — adds a pop-up window to be opened as user clicks on the polyline.
     * `setPopupOptions(PopupWindowOptions)` — specifies options for a pop-up window added by previous method.
-
+    * `setTooltipContent(String)` — adds a tooltip to be opened as user hovers on the polyline.
+    * `setTooltipOptions(TooltipOptions)` — specifies options for a tooltip added by previous method.
 
 *`CanvasLayer.Polyline` events*:
 
@@ -736,12 +969,11 @@ return territory.getName();
 
 *`CanvasLayer.Polygon` methods*:
 
-    * `org.locationtech.jts.geom.Geometry getGeometry()` — returns the geometry value.
-    * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
     * `setStyle(PolygonStyle)` — applies a style to the polygon.
     * `setPopupContent(String)` — adds a pop-up window to be opened as user clicks on the polygon.
     * `setPopupOptions(PopupWindowOptions)` — specifies options for a pop-up window added by previous method.
-
+    * `setTooltipContent(String)` — adds a tooltip to be opened as user hovers on the polygon.
+    * `setTooltipOptions(TooltipOptions)` — specifies options for a tooltip added by previous method.
 
 *`CanvasLayer.Polygon` events*:
 
@@ -751,6 +983,17 @@ return territory.getName();
 
 You can subscribe to events fired by a particular canvas geometry or you can subscribe to events fired by all points, polylines or polygons using the `CanvasLayer` interface.
 
+`CanvasLayer.Point`, `CanvasLayer.Polyline`, `CanvasLayer.Polygon` inherit methods from `CanvasLayer.Geometry`.
+
+*`CanvasLayer.Geometry` methods*:
+
+    * `org.locationtech.jts.geom.Geometry getGeometry()` — returns the geometry value.
+    * `setEditable(boolean)` — sets whether the geometry is to be modifiable.
+    * `isEditable()` — whether the geometry is modifiable.
+    * `openPopup()` — opens the pop-up of the geometry if the pop-up text is specified.
+    * `openTooltip()` — opens the tooltip of the geometry if the tooltip text is specified.
+    * `closePopup()` — closes the pop-up of the geometry.
+    * `closeTooltip()` — closes the tooltip of the geometry.
 
 [appendix]
 = Glossary
