@@ -50,8 +50,8 @@ See https://github.com/cuba-platform/maps-addon-demo[sample application] using t
 == Release Notes
 
 [discrete]
-[[release_1_2]]
-=== Release 1.2
+[[release_1_2_0]]
+=== Release 1.2.0
 
 . Optimized vector layers refreshing.
 . Added <<Tooltip,tooltips>> support.
@@ -508,7 +508,7 @@ private void addTerritory() {
 }
 ----
 +
-The drawback of this method is that it adds a new geo-object instance every time the method is called, even if the geometry hasn't been drawn). It can be worked around by using a temporary geo-object variable and checking whether the geometry was set to the previously created instance:
+The drawback of this method is that it adds a new geo-object instance every time the method is called, even if the geometry hasn't been drawn. It can be worked around by using a temporary geo-object variable and checking whether the geometry was set to the previously created instance:
 +
 [source,java]
 ----
@@ -596,7 +596,7 @@ if (geoObjectWrapper != null) {
     geoObjectWrapper.openPopup();
 }
 ----
-TIP: If the geometry value of the geo-object is null, then there is no `GeoObjectWrapper` for this geo-object.
+WARNING: If the geometry value of the geo-object is null, then there is no `GeoObjectWrapper` for this geo-object.
 
 Also, be aware that `GeoObjectWrapper` instances can be changed or replaced after refreshing the layer. So always use this map to get the relevant wrapper instance.
 
@@ -992,7 +992,7 @@ You can subscribe to events fired by a particular canvas geometry or you can sub
     * `isEditable()` — whether the geometry is modifiable.
     * `openPopup()` — opens the pop-up of the geometry if the pop-up text is specified.
     * `openTooltip()` — opens the tooltip of the geometry if the tooltip text is specified.
-    * `closePopup()` — closes the pop up of the geometry.
+    * `closePopup()` — closes the pop-up of the geometry.
     * `closeTooltip()` — closes the tooltip of the geometry.
 
 [appendix]
