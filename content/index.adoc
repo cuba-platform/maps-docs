@@ -50,6 +50,13 @@ See https://github.com/cuba-platform/maps-addon-demo[sample application] using t
 == Release Notes
 
 [discrete]
+[[release_1_2_1]]
+=== Release 1.2.1
+. Added HeatMap layer support. Setting a heat map has become easier and can be done in XML descriptor.
+. Added Image layer support. Allows you to display an image inside specific borders on a map.
+. Added some useful methods to GeoMap API.
+
+[discrete]
 [[release_1_2_0]]
 === Release 1.2.0
 
@@ -168,7 +175,7 @@ xmlns:maps="http://schemas.haulmont.com/maps/0.1/ui-component.xsd"
 3. Define the basic component properties `id`, `height`, `width`, `center`, `zoom`, if necessary where:
 +
  * *center* — coordinates of the initial geographical center of the map (longitude, latitude).
- * *zoom* — initial zoom level. The default value is 15.
+ * *zoom* — initial zoom level. The default value is `15`.
 +
 
 4. Add one of raster layers to display a map on the screen. Here is an example of OpenStreetMap tile layer.
@@ -342,7 +349,7 @@ See more `WMSTileLayer` methods in <<maps-api>>.
 
 Image layer is used for displaying an image over specific bounds of a map.
 
-`ImageLayer` layer can be declared in the XML descriptor:
+`ImageLayer` can be declared in the XML descriptor:
 
 [source,xml]
 ----
@@ -357,23 +364,23 @@ Image layer is used for displaying an image over specific bounds of a map.
 The path should start with one of the following prefixes defining the source of an image:
 
 ** `url:` — the image will be loaded from the given URL.
-** `file:`  — the image will be served from file system.
+** `file:`  — the image will be served from the file system.
 +
-[source]
+[source,xml]
 ----
 image="file:D:/myImage.png"
 ----
 
 ** `classpath:` — the image will be served from classpath, for example, `com/company/demo/web/myImage.png`:
 +
-[source]
+[source,xml]
 ----
 image="classpath:/com/company/demo/web/myImage.png"
 ----
 
 ** `theme:` — the image will be served from the current theme directory, for example, `web/themes/hover/awesomeFolder/myImage.png`:
 +
-[source]
+[source,xml]
 ----
 image="theme:awesomeFolder/myImage.png"
 ----
@@ -392,8 +399,8 @@ private GeoImage imageDelegate(ImageLayer layer) {
 }
 ----
 
-* `topLeft` - the north-west point of an image (longitude, latitude).
-* `bottomRight` - the south-east point of an image (longitude, latitude).
+* `topLeft` - the north-west point of the image (longitude, latitude).
+* `bottomRight` - the south-east point of the image (longitude, latitude).
 
 TIP: In case of using an SVG image in the `ImageLayer`, make sure that SVG document contains `width/height` or `viewBox` attributes, which are needed for the SVG image to behave correctly on zooming a map.
 
@@ -622,7 +629,7 @@ To enable clustering add `cluster` element inside `vector` in the XML descriptor
 
 You can specify additional clustering options:
 
-* *radius* — maximum radius that a cluster will cover, in pixels (default: 80).
+* *radius* — maximum radius that a cluster will cover, in pixels. The default value is `80`.
 * *weightProperty* — if specified, then each point of the layer will have a weight value (int) defined by weight property of a geo-object.
 This value will be used when calculating the summed up value of the cluster (by default, the number of points is used).
 * *showCoverage* — show bounds of the cluster when hovering a mouse over it.
@@ -665,7 +672,7 @@ Also, be aware that `GeoObjectWrapper` instances can be changed or replaced afte
 
 image::heatmap.png[]
 
-`HeatMapLayer` layer can be declared in the XML descriptor:
+`HeatMapLayer` can be declared in the XML descriptor:
 
 [source,xml]
 ----
@@ -679,7 +686,7 @@ heatMapLayer.setDataContainer(ordersDc);
 map.addLayer(heatMapLayer);
 ----
 
-The layer's data can be provided in one of 2 different ways:
+The layer's data can be provided in one of two different ways:
 
 * Using `dataContainer`:
 +
@@ -688,9 +695,7 @@ The layer's data can be provided in one of 2 different ways:
 <maps:heatmap id="heatmapLayer" dataContainer="ordersDc"/>
 ----
 +
-The items of the data container should be geo-objects having a `@Geometry` property of `Point` type.
-The intensity value of each point equals 1 by default.
-If the intensity value should be taken from some other property of number type (for example, `amount`), this property can be specified along with the data container:
+The items of the data container should be geo-objects having the `@Geometry` property of the `Point` type. The intensity value of each point equals `1` by default. If the intensity value should be taken from some other property of number type (for example, `amount`), this property can be specified along with the data container:
 +
 [source,xml]
 ----
@@ -714,14 +719,14 @@ private Double calculateIntensity(Order order) {
     ...
 }
 ----
-TIP: Intensity value of a point is in range between 0 and 1 by default. You can change this range by setting different maximum intensity value in the `maximumIntensity` property.
+TIP: The intensity value of a point is in a range between `0` and `1` by default. You can change this range by setting different maximum intensity value in the `maximumIntensity` property.
 
 You can customize the appearance of a heatmap using various options:
 
-* *maximumIntensity* — the maximum point intensity (default: 1).
-* *blur* — the amount of blur in a point (default: 15).
-* *radius* — the radius of each point of a heatmap in pixels (default: 25).
-* *minOpacity* — the minimum opacity the heat will start at (default: 0.05).
+* *maximumIntensity* — the maximum point intensity. The default value is `1`.
+* *blur* — the amount of blur in a point. The default value is `15`.
+* *radius* — the radius of each point of a heatmap in pixels. The default value is `25`.
+* *minOpacity* — the minimum opacity the heat will start at. The default value is `0.05`.
 * *maxIntensityZoom* — the zoom level where the points reach maximum intensity (as intensity scales with zoom).
 By default, equals the maxZoom of a map.
 * *gradient* — the color gradient config defined by a map of pairs `[intensityValue : rgbColor]`. Can be described in the XML descriptor this way:
@@ -829,8 +834,8 @@ It is also possible to set the additional options for a pop-up window by passing
 
 * *closeButtonEnabled* — whether the close button is enabled in a pop-up window.
 * *closeOnClick* — whether pop-up should be closed when a user clicks on the map.
-* *maxWidth* — max width of the pop-up, in pixels (default: 300).
-* *minWidth* — min width of the pop-up, in pixels (default: 50).
+* *maxWidth* — max width of the pop-up, in pixels. The default value is `300`.
+* *minWidth* — min width of the pop-up, in pixels. The default value is `50`.
 
 It is possible to attach a pop-up window to a geometry. The pop-up window will be opened when a user clicks on the geometry on a map.
 
