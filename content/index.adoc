@@ -338,6 +338,65 @@ map.addLayer(wmsTileLayer);
 
 See more `WMSTileLayer` methods in <<maps-api>>.
 
+===== Image Layer
+
+Image layer is used for displaying an image over specific bounds of a map.
+
+`ImageLayer` layer can be declared in the XML descriptor:
+
+[source,xml]
+----
+<maps:image id="imageLayer"
+            image="url:https://legacy.lib.utexas.edu/maps/historical/newark_nj_1922.jpg"
+            topLeft="-74.22655, 40.773941"
+            bottomRight="-74.12544, 40.712216"
+            opacity="0.5"/>
+----
+
+* `image` parameter describes a path to the image.
+The path should start with one of the following prefixes defining the source of an image:
+
+** `url:` — the image will be loaded from the given URL.
+** `file:`  — the image will be served from file system.
++
+[source]
+----
+image="file:D:/myImage.png"
+----
+
+** `classpath:` — the image will be served from classpath, for example, `com/company/demo/web/myImage.png`:
++
+[source]
+----
+image="classpath:/com/company/demo/web/myImage.png"
+----
+
+** `theme:` — the image will be served from the current theme directory, for example, `web/themes/hover/awesomeFolder/myImage.png`:
++
+[source]
+----
+image="theme:awesomeFolder/myImage.png"
+----
++
+You can also load the image programmatically by declaring the `geoImageDelegate` function:
++
+[source,java]
+----
+import com.haulmont.addon.maps.web.gui.components.layer.GeoImage;
+...
+
+@Install(to = "map.imageLayer", subject = "geoImageDelegate")
+private GeoImage imageDelegate(ImageLayer layer) {
+    String url = "https://legacy.lib.utexas.edu/maps/historical/newark_nj_1922.jpg";
+    return GeoImage.fromUrl(url);
+}
+----
+
+* `topLeft` - the north-west point of an image (longitude, latitude).
+* `bottomRight` - the south-east point of an image (longitude, latitude).
+
+TIP: In case of using an SVG image in the `ImageLayer`, make sure that SVG document contains `width/height` or `viewBox` attributes, which are needed for the SVG image to behave correctly on zooming a map.
+
 ==== Creating Geo-objects
 
 Geo-object is an entity having a property of a geometry type. This property should have one of the geo-specific datatypes that are included in the `com.haulmont.addon.maps.gis.datatypes` package:
@@ -535,7 +594,7 @@ private void addTerritory() {
 
     canvas.drawPolygon(polygon -> {
         Territory territory = dataContext.create(Territory.class);
-        territory.setPolygon((Polygon) polygon.getGeometry());
+        territory.setPolygon(polygon.getGeometry());
         territoriesDc.getMutableItems().add(territory);
         territoriesLayer.setSelectedGeoObject(territory);
         canvas.removePolygon(polygon);
@@ -600,6 +659,84 @@ WARNING: If the geometry value of the geo-object is null, then there is no `GeoO
 
 Also, be aware that `GeoObjectWrapper` instances can be changed or replaced after refreshing the layer. So always use this map to get the relevant wrapper instance.
 
+==== Heatmap Layer
+
+`HeatMapLayer` provides a visual representation of data density across a set of geographical points.
+
+image::heatmap.png[]
+
+`HeatMapLayer` layer can be declared in the XML descriptor:
+
+[source,xml]
+----
+<maps:heatmap id="heatmapLayer" dataContainer="ordersDc"/>
+----
+or created programmatically in a screen controller using `com.haulmont.addon.maps.web.gui.components.layer.HeatMapLayer` class:
+[source,java]
+----
+HeatMapLayer heatMapLayer = new HeatMapLayer("heatmapLayer");
+heatMapLayer.setDataContainer(ordersDc);
+map.addLayer(heatMapLayer);
+----
+
+The layer's data can be provided in one of 2 different ways:
+
+* Using `dataContainer`:
++
+[source,xml]
+----
+<maps:heatmap id="heatmapLayer" dataContainer="ordersDc"/>
+----
++
+The items of the data container should be geo-objects having a `@Geometry` property of `Point` type.
+The intensity value of each point equals 1 by default.
+If the intensity value should be taken from some other property of number type (for example, `amount`), this property can be specified along with the data container:
++
+[source,xml]
+----
+<maps:heatmap id="heatmapLayer"
+              dataContainer="ordersDc"
+              intensityProperty="amount"/>
+----
++
+* By specifying `dataDelegate` function which builds a map of points and their intensity values:
++
+[source,java]
+----
+@Install(to = "map.heatmapLayer", subject = "dataDelegate")
+private Map<Point, Double> setHeatmapDataDelegate(HeatMapLayer layer) {
+    return ordersDc.getItems().stream()
+        .filter(order -> order.getLocation()!= null)
+        .collect(Collectors.toMap(Order::getLocation, this::calculateIntensity));
+}
+
+private Double calculateIntensity(Order order) {
+    ...
+}
+----
+TIP: Intensity value of a point is in range between 0 and 1 by default. You can change this range by setting different maximum intensity value in the `maximumIntensity` property.
+
+You can customize the appearance of a heatmap using various options:
+
+* *maximumIntensity* — the maximum point intensity (default: 1).
+* *blur* — the amount of blur in a point (default: 15).
+* *radius* — the radius of each point of a heatmap in pixels (default: 25).
+* *minOpacity* — the minimum opacity the heat will start at (default: 0.05).
+* *maxIntensityZoom* — the zoom level where the points reach maximum intensity (as intensity scales with zoom).
+By default, equals the maxZoom of a map.
+* *gradient* — the color gradient config defined by a map of pairs `[intensityValue : rgbColor]`. Can be described in the XML descriptor this way:
++
+[source,xml]
+----
+<maps:heatmap id="heatmap" dataContainer="ownersDc">
+    <maps:gradient>
+        <maps:intensity value="0.4" color="blue"/>
+        <maps:intensity value="0.65" color="lime"/>
+        <maps:intensity value="1" color="red"/>
+    </maps:gradient>
+</maps:heatmap>
+----
+
 === Drawing Geometry
 
 Open a screen containing a map with an editable `VectorLayer`.
@@ -657,7 +794,7 @@ You can also draw geometries on the canvas via UI. For example, to draw a point 
 [source,java]
 ----
 canvasLayer.drawPoint(point -> {
-    address.setLocation((Point) point.getGeometry());
+    address.setLocation(point.getGeometry());
 });
 ----
 
@@ -678,25 +815,6 @@ You can also specify the selected layer in the XML descriptor:
 See more `CanvasLayer` methods and events in <<maps-api>>.
 
 === Additional Options
-
-==== Heatmaps
-
-Heatmaps provide a visual representation of data density across a set of geographical points.
-
-image::heatmap.png[]
-
-`GeoMap` UI component provides a method for adding a heatmap overlay to a map: `addHeatMap(Map<Point, Double> intensityMap)`, where each entry of the map represents a geo-point and it's intensity value, which should range between 0 and 1.
-
-You can customize the appearance of a heatmap and change the intensity value range using the overloaded method `addHeatMap(Map<Point, Double> intensityMap, HeatMapOptions heatMapOptions)`.
-
-Class `HeatMapOptions` contains various options for a heatmap:
-
- * *maximumIntensity* — the maximum point intensity (default: 1).
- * *blur* — the amount of blur in a point (default: 15).
- * *radius* — the radius of each point of a heatmap in pixels (default: 25).
- * *gradient* — the color gradient config defined by a map of pairs `[intensityValue : rgbColor]`. For example, `[0.4: 'blue', 0.65: 'lime', 1: 'red']`.
- * *minOpacity* — the minimum opacity the heat will start at (default: 0.05).
- * *maxZoom* — the zoom level where the points reach maximum intensity (as intensity scales with zoom). By default, equals the maxZoom of a map.
 
 ==== Pop-up Window
 
@@ -768,9 +886,9 @@ In case of Canvas geometries, you can specify tooltips this way:
 [source,java]
 ----
 CanvasLayer.Point location = canvasLayer.addPoint(address.getLocation());
-TooltipOptions tooltipOptions = new TooltipOptions();
-tooltipOptions.setPermanent(true);
-tooltipOptions.setOpacity(0.7);
+TooltipOptions tooltipOptions = new TooltipOptions()
+        .setPermanent(true)
+        .setOpacity(0.7);
 location.setTooltipContent(address.getName())
         .setTooltipOptions(tooltipOptions);
 ----
@@ -932,6 +1050,7 @@ return territory.getName();
     * `void drawPoint(Consumer<CanvasLayer.Point>)` — activates the point drawing mode on the map. After the point is drawn, the given consumer action is applied to it.
     * `void drawPolyline(Consumer<CanvasLayer.Polyline>)` — activates the polyline drawing mode on the map. After the polyline is drawn, the given consumer action is applied to it.
     * `void drawPolygon(Consumer<CanvasLayer.Polygon>)` — activates the polygon drawing mode on the map. After the polygon is drawn, the given consumer action is applied to it.
+    * `void cancelDrawing()` — cancels the drawing mode.
 
 `addPoint` method returns an instance of `CanvasLayer.Point` which controls the added point on the canvas.
 
