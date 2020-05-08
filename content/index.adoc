@@ -287,9 +287,11 @@ To add a tile layer on a map declare it in the XML descriptor:
               attribution="&#169; &lt;a href=&quot;https://www.openstreetmap.org/copyright&quot;&gt;OpenStreetMap&lt;/a&gt; contributors"/>
 ----
 
-`id` and `url` parameters are required.
+`id` parameter is required as well as `urlPattern` (only if you have not specified `tileProvider`).
 
 TIP: The most tile servers require attribution, which you can set in `attribution` parameter. In our example the credit ©OpenStreetMap contributors will appear in the lower-right corner.
+
+In `subdomains` parameter you can specify comma-separated values for `{s}` placeholder in the `urlPattern`. Default values are `"a,b,c"` which are used by the most tile services including OpenStreetMap.
 
 In order not to clutter the XML descriptors with the URL and attribution strings:
 
