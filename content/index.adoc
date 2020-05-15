@@ -50,8 +50,8 @@ See https://github.com/cuba-platform/maps-addon-demo[sample application] using t
 == Release Notes
 
 [discrete]
-[[release_1_2_1]]
-=== Release 1.2.1
+[[release_1_3_0]]
+=== Release 1.3.0
 . Added HeatMap layer support. Setting a heat map has become easier and can be done in XML descriptor.
 . Added Image layer support. Allows you to display an image inside specific borders on a map.
 . Added some useful methods to GeoMap API.
