@@ -131,6 +131,121 @@ image::continue.png[]
 
 *Maps* add-on will be installed in your project.
 
+=== Manual Installation
+
+Use this way of installation in case you build your project from the command line or your subscription does not include Studio Premium Subscription.
+
+*Adding Premium Repository*
+
+Open `build.gradle` file and add one more repository:
+
+* If the main repository is `repo.cuba-platform.com`, add `++https://repo.cuba-platform.com/content/groups/premium++`
++
+[source,java]
+----
+buildscript {
+    // ...
+    repositories {
+        // ...
+        maven {
+            url 'https://repo.cuba-platform.com/content/groups/premium'
+            credentials {
+                username(rootProject.hasProperty('premiumRepoUser') ?
+                        rootProject['premiumRepoUser'] : System.getenv('CUBA_PREMIUM_USER'))
+                password(rootProject.hasProperty('premiumRepoPass') ?
+                        rootProject['premiumRepoPass'] : System.getenv('CUBA_PREMIUM_PASSWORD'))
+            }
+        }
+    }
+}
+----
++
+* If the main repository is Bintray, add `++https://cuba-platform.bintray.com/premium++`
++
+[source,java]
+----
+buildscript {
+    // ...
+    repositories {
+        // ...
+        maven {
+            url 'https://cuba-platform.bintray.com/premium'
+            credentials {
+                username(rootProject.hasProperty('bintrayPremiumRepoUser') ?
+                        rootProject['bintrayPremiumRepoUser'] : System.getenv('CUBA_PREMIUM_USER'))
+                password(rootProject.hasProperty('premiumRepoPass') ?
+                        rootProject['premiumRepoPass'] : System.getenv('CUBA_PREMIUM_PASSWORD'))
+            }
+        }
+    }
+}
+----
+
+*Providing Credentials*
+
+Your license key consists of two parts: the first part before the dash is a repository user name, the part after the dash is a password. For example, if your key is `111111222222-abcdefabcdef`, then the user name is `111111222222` and the password is `abcdefabcdef`. In case of Bintray, the user name must be followed by `@cuba-platform`.
+
+You can provide the credentials in one of the following ways:
+
+* The recommended way is to create a `~/.gradle/gradle.properties` file in your user home directory and set properties in it:
++
+[source]
+----
+premiumRepoUser=111111222222
+bintrayPremiumRepoUser=111111222222@cuba-platform
+premiumRepoPass=abcdefabcdef
+----
++
+* Alternatively, you can specify the credentials in the CUBA_PREMIUM_USER and CUBA_PREMIUM_PASSWORD environment variables.
+* When you run Gradle tasks from the command line, you can also pass the properties as command-line arguments with the `-P` prefix, for example:
++
+[source]
+----
+gradlew assemble -PpremiumRepoUser=111111222222 -PpremiumRepoPass=abcdefabcdef
+----
+
+*Adding Component*
+
+. In the `build.gradle` file specify the component artifacts in the dependencies section as follows:
++
+[source]
+----
+com.haulmont.addon.maps:maps-global:<add-on version>
+----
++
+where `<add-on version>` is compatible with the used version of the CUBA platform.
++
+|===
+| Platform Version | Add-on Version
+| 7.2.x            | 1.2.0
+| 7.1.x            | 1.1.0
+| 7.0.x            | 1.0.0 
+|===
++
+For example:
++
+[source,java]
+----
+dependencies {
+   //...
+   appComponent("com.haulmont.addon.maps:maps-global:1.2.0")
+}
+----
++
+. Specify the add-on identifier `com.haulmont.addon.maps` in the `web.xml` files of the `core` and `web` modules in the `appComponents` context parameter:
++
+[source,xml]
+----
+<context-param>
+       <param-name>appComponents</param-name>
+       <param-value>com.haulmont.cuba com.haulmont.addon.maps</param-value>
+</context-param>
+----
++
+. If you run Gradle tasks from the command line run `gradlew assemble`.
+
+The add-on will be included in your project.
+
 == Components Compatibility
 
 If your project uses Charts and Maps add-on (or other add-ons providing their own widgetsets), you should add `web-toolkit` module in your project. It is needed to integrate widgetsets from all used add-ons.
