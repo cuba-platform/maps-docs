@@ -52,9 +52,32 @@ See https://github.com/cuba-platform/maps-addon-demo[sample application] using t
 [discrete]
 [[release_1_3_0]]
 === Release 1.3.0
-. Added HeatMap layer support. Setting a heat map has become easier and can be done in XML descriptor.
-. Added Image layer support. Allows you to display an image inside specific borders on a map.
-. Added some useful methods to GeoMap API.
+. Added <<Heatmap Layer,HeatMap layer>> support. Setting a heat map has become easier and can be done in XML descriptor:
++
+```xml
+<maps:heatmap id="heatmapLayer"
+              dataContainer="ordersDc"
+              intensityProperty="amount"
+              maximumIntensity="100"
+              minOpacity="0.4"/>
+```
+. Added <<Image Layer,Image layer>> support. Allows you to display an image inside specific borders on a map:
++
+```xml
+  <maps:image id="imageLayer"
+            image="url:https://www.cuba-platform.com/uploads/a07f0d67b82f44329b5b3cef5e8bfa29.jpg"
+            topLeft="-37.88085, 53.54030"
+            bottomRight="-11.10742, 44.65302"
+            opacity="0.5"/>
+```
+. Added some useful methods to GeoMap API:
+
+* `List<Layer> getLayers()`  —  returns a list of layers currently added to the map.
+* `Point getCenter()` — returns current geographic center of the map.
+* `double getZoomLevel()` — returns current map zoom level.
+* `void zoomToBounds(Point topLeft, Point bottomRight)` — sets a map view that contains the given geographical bounds with the maximum zoom level possible.
+* `void zoomToGeometry(Geometry geometry)` — sets a map view that contains envelope of the given geometry with the maximum zoom level possible.
+
 
 [discrete]
 [[release_1_2_0]]
@@ -850,7 +873,7 @@ By default, equals the maxZoom of a map.
 +
 [source,xml]
 ----
-<maps:heatmap id="heatmap" dataContainer="ownersDc">
+<maps:heatmap id="heatmap" dataContainer="ordersDc">
     <maps:gradient>
         <maps:intensity value="0.4" color="blue"/>
         <maps:intensity value="0.65" color="lime"/>
@@ -1089,18 +1112,21 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
     * `void removeLayer(Layer)` — removes a layer from the map.
     * `<T extends Layer> T getLayer(String)` —  returns a layer by its ID. Throws `IllegalArgumentException` if a layer with the given ID is not present on the map.
     * `<T extends Layer> T getLayerOrNull(String layerId)`  —  returns a layer by its ID or `null` if a layer with the given ID is not present on the map.
+    * `List<Layer> getLayers()`  —  returns a list of layers currently added to the map.
     * `void setCenter(double, double)` — sets the initial geographic center of the map (longitude, latitude).
+    * `Point getCenter()` — returns current geographic center of the map.
     * `void setZoomLevel(double)` — sets map zoom level.
+    * `double getZoomLevel()` — returns current map zoom level.
     * `void setMaxZoom(int)` — sets maximum map zoom level.
     * `void setMinZoom(int)` — sets minimum map zoom level.
+    * `void zoomToBounds(Point topLeft, Point bottomRight)` — sets a map view that contains the given geographical bounds with the maximum zoom level possible.
+    * `void zoomToGeometry(Geometry geometry)` — sets a map view that contains envelope of the given geometry with the maximum zoom level possible.
     * `GeoMap.Bounds getBounds()` — returns the bounds of the map which define the viewport of the map.
     * `void setReadOnly(boolean)` — enables/disables zooming and dragging the map (changing the viewing area).
     * `CanvasLayer getCanvas()` — returns the canvas layer of the map.
     * `void selectLayer(Layer layer)` — sets the selected (active) layer of the map.
     * `void selectLayerById(Layer layer)` — sets the selected (active) layer of the map by the given id of the layer.
     * `Layer getSelectedLayer()` — returns the selected layer of the map.
-    * `addHeatMap(Map<Point, Double>)` — adds a heatmap to the map.
-    * `addHeatMap(Map<Point, Double>, HeatMapOptions)` — adds a heatmap to the map with the additional options.
     * `void openPopup(PopupWindow)` — opens a pop-up info window.
 
 
