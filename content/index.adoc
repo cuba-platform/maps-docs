@@ -29,7 +29,7 @@
 
 The add-on gives you an easy way to enrich your application with visual representation and intuitive manipulation for spatial data. With this add-on you are free to use a preferable map provider that meets your needs as it is compatible with the <<appendix-b-web-map-service>> protocol as well as <<appendix-b-xyz-tiles>> services.
 
-The component integrates spatial types (point, polyline, polygon) from https://locationtech.github.io/jts/[JTS Topology Suite (JTS)] — the most popular Java library for working with spatial data. The add-on provides all the required features to build a comprehensive geographical information system on CUBA.
+The component integrates spatial types (point, polyline, polygon) from https://locationtech.github.io/jts/[JTS Topology Suite (JTS)] — the most popular Java library for working with spatial data. The add-on provides all the required features to build a comprehensive geographical information system on Jmix.
 
 The add-on supports the traditional multi-layer structure, so it gives full freedom to create well-structured maps of any content.
 
@@ -282,7 +282,7 @@ You are able to define the main map parameters along with the layers in the XML 
 
 === Inserting a Map into a Screen
 
-The `com.haulmont.addon.maps.web.gui.components.GeoMap` UI component is used to display a map in your application screen.
+The `io.jmix.mapsui.component.GeoMap` UI component is used to display a map in your application screen.
 
 To add the component, do the followings:
 
@@ -290,7 +290,7 @@ To add the component, do the followings:
 +
 [source,xml]
 ----
-xmlns:maps="http://schemas.haulmont.com/maps/0.1/ui-component.xsd"
+xmlns:maps="http://jmix.io/schema/maps/ui"
 ----
 +
 2. Declare the component. XML name of the UI component is `geoMap`. Component declaration example:
@@ -323,10 +323,9 @@ XML descriptor can look like this one:
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd"
-        caption="Map"
-        messagesPack="com.company.mapstest.web"
-        xmlns:maps="http://schemas.haulmont.com/maps/0.1/ui-component.xsd">
+<window xmlns="http://jmix.io/schema/ui/window"
+        xmlns:maps="http://jmix.io/schema/maps/ui"
+        caption="Map">
     <layout>
         <maps:geoMap id="map" height="100%" width="100%" center="-99.755859, 39.164141" zoom="4">
             <maps:layers>
@@ -342,11 +341,11 @@ You can see that OpenStreetMap is added as a tile layout. The screen contains a 
 
 image::openstreetmap.png[]
 
-Additional configuration of the map and its layers can be performed in the screen controller. You need to add the component declared in the XML descriptor with `@Inject` annotation:
+Additional configuration of the map and its layers can be performed in the screen controller. You need to add the component declared in the XML descriptor with `@Autowired` annotation:
 
 [source,java]
 ----
-@Inject
+@Autowired
 private GeoMap map;
 
 @Subscribe
@@ -430,7 +429,7 @@ In `subdomains` parameter you can specify comma-separated values for `{s}` place
 
 In order not to clutter the XML descriptors with the URL and attribution strings:
 
-1. Move tile server settings to a Spring bean implementing `com.haulmont.addon.maps.web.gui.components.layer.TileProvider` interface.
+1. Move tile server settings to a Spring bean implementing `io.jmix.mapsui.component.layer.TileProvider` interface.
 2. Specify a bean name in a `tileProvider` attribute of the `tile` element.
 
 OpenStreetMap tile provider comes out of the box, so you can use it like this:
@@ -441,7 +440,7 @@ OpenStreetMap tile provider comes out of the box, so you can use it like this:
            tileProvider="maps_OpenStreetMap"/>
 ----
 
-Additionally you can perform the tile layer in the screen controller using `com.haulmont.addon.maps.web.gui.components.layer.TileLayer` class:
+Additionally you can perform the tile layer in the screen controller using `io.jmix.mapsui.component.layer.TileLayer` class:
 
 [source,java]
 ----
@@ -469,7 +468,7 @@ Various WMS services can be used as a map provider.
 
 image::wms.png[]
 
-Also, you can perform a layer in the screen controller using `com.haulmont.addon.maps.web.gui.components.layer.WMSTileLayer` class:
+Also, you can perform a layer in the screen controller using `io.jmix.mapsui.component.layer.WMSTileLayer` class:
 
 [source,java]
 ----
@@ -526,7 +525,7 @@ You can also load the image programmatically by declaring the `geoImageDelegate`
 +
 [source,java]
 ----
-import com.haulmont.addon.maps.web.gui.components.layer.GeoImage;
+import io.jmix.mapsui.component.layer.GeoImage;
 ...
 
 @Install(to = "map.imageLayer", subject = "geoImageDelegate")
@@ -543,13 +542,13 @@ TIP: In case of using an SVG image in the `ImageLayer`, make sure that SVG docum
 
 ==== Creating Geo-objects
 
-Geo-object is an entity having a property of a geometry type. This property should have one of the geo-specific datatypes that are included in the `com.haulmont.addon.maps.gis.datatypes` package:
+Geo-object is an entity having a property of a geometry type. This property should have one of the geo-specific datatypes that are included in the `io.jmix.maps.datatype` package:
 
 |===
 | *Datatype* | *Java type*
-| GeoPoint         | org.locationtech.jts.geom.Point
-| GeoPolyline      | org.locationtech.jts.geom.LineString
-| GeoPolygon       | org.locationtech.jts.geom.Polygon
+| geoPoint         | org.locationtech.jts.geom.Point
+| geoPolyline      | org.locationtech.jts.geom.LineString
+| geoPolygon       | org.locationtech.jts.geom.Polygon
 |===
 
 To add the property:
@@ -564,24 +563,23 @@ image::geotypes.png[]
 +
 TIP: Geo-object must have one geometry property, otherwise an exception will be thrown when drawing the layer.
 +
-* `@Convert` — specifies a JPA converter defining how the datatype will be persisted. JPA converters for the component datatypes are included in the package: `com.haulmont.addon.maps.gis.converters`.
+* `@Convert` — allows you to specify a custom JPA converter defining how the datatype will be persisted.
++
+TIP: By default, the add-on uses JPA converters that transform coordinates into the https://en.wikipedia.org/wiki/Well-known_text[WKT]
+format which consequently persists as a text. While loading from DB this text will be parsed back into the objects. These converters are included in the package: `io.jmix.maps.converter.wkt`.
 
-The current version of the component includes converters that transform coordinates into the https://en.wikipedia.org/wiki/Well-known_text[WKT]
-format which consequently persists as a text.
-While loading from DB this text will be parsed back into the objects.
 
 Here is an example of geo-object `Address`:
 
 [source,java]
 ----
-@Entity
-public class Address extends StandardEntity {
+@JmixEntity
+public class Address {
     ...
 
     @Column(name = "LOCATION")
+    @PropertyDatatype("geoPoint")
     @Geometry
-    @MetaProperty(datatype = "GeoPoint")
-    @Convert(converter = CubaPointWKTConverter.class)
     protected Point location;
 
     ...
@@ -599,7 +597,7 @@ Vector layers help to effectively work with a group of related geo-objects. Vect
 
 `VectorLayer` is a base layer for displaying your entities on the map. It is a data-aware component acting as a connector between data (geo-objects) and a map.
 
-To bind geo-objects with the layer you need to pass a `datacontainer` (or `datasource` in case of using in legacy screens) to the vector layer. This can be declared in the XML descriptor:
+To bind geo-objects with the layer you need to pass a `datacontainer` to the vector layer. This can be declared in the XML descriptor:
 
 [source,xml]
 ----
@@ -610,7 +608,7 @@ To bind geo-objects with the layer you need to pass a `datacontainer` (or `datas
 </maps:geoMap>
 ----
 
-`id` and `dataContainer` (`dataSource` in case of using in legacy screens) are required parameters. Vector layer works with both `InstanceContainer` and `CollectionContainer`.
+`id` and `dataContainer` are required parameters. Vector layer works with both `InstanceContainer` and `CollectionContainer`.
 
 To make the layer editable add the `editable` parameter:
 
@@ -629,16 +627,19 @@ Additionally you can create `VectorLayer` in the screen controller:
 
 [source,java]
 ----
-VectorLayer<Order> orderLayer = new VectorLayer<>("orderLayer", new ContainerVectorLayerItems<>(ordersDc));
+VectorLayer<Order> orderLayer = new VectorLayer<>("orderLayer", ordersDc);
 map.addLayer(orderLayer);
 ----
 
-To determine geometry style for geo-objects use `setStyleProvider()` method. In CUBA 7.0+ screens you can perform this declaratively using the `@Install` annotation in the screen controller, for example:
+To determine geometry style for geo-objects use `setStyleProvider()` method. You can also perform this declaratively using the `@Install` annotation in the screen controller, for example:
 [source,java]
 ----
+@Autowired
+private GeometryStyles geometryStyles;
+
 @Install(to = "map.territoryLayer", subject = "styleProvider")
 private GeometryStyle territoryLayerStyleProvider(Territory territory) {
-        return new PolygonStyle()
+        return geometryStyles.polygon()
                .setFillColor("#08a343")
                .setStrokeColor("#004912")
                .setFillOpacity(0.3)
@@ -646,7 +647,7 @@ private GeometryStyle territoryLayerStyleProvider(Territory territory) {
 }
 ----
 
-Classes for geometry style are included in the `com.haulmont.addon.maps.web.gui.components.layer.style` package.
+Use `io.jmix.mapsui.component.layer.style.GeometryStyles` bean for creating styles for different geometry types.
 
 Geo-objects can be selected by user click or automatically from the associated data container.
 
@@ -775,7 +776,7 @@ This value will be used when calculating the summed up value of the cluster (by 
 
 ===== Working with Underlying Vaadin Components of Geo-objects
 
-For each geo-object displayed on a map the add-on creates an instance of the `com.haulmont.addon.maps.web.gui.components.leaflet.translators.GeoObjectWrapper` class that keeps the underlying Vaadin Component. This class provides methods to work directly with the wrapped component:
+For each geo-object displayed on a map the add-on creates an instance of the `io.jmix.mapsui.component.leaflet.translators.GeoObjectWrapper` class that keeps the underlying Vaadin Component. This class provides methods to work directly with the wrapped component:
 
  - `openPopup()` - opens the pop-up window of the geo-object, if the pop-up content is specified.
  - `closePopup()` - closes the pop-up window of the geo-object.
@@ -783,15 +784,15 @@ For each geo-object displayed on a map the add-on creates an instance of the `co
  - `closeTooltip()` - closes the tooltip of the geo-object.
  - `getLeafletComponent()` - returns the underlying Vaadin Component (connected with the Leaflet component on the client side).
 
-To obtain geo-object wrappers for a vector layer invoke the `getGeoObjectWrappersMap()` method of the `WebGeoMap` class (implementation of the `GeoMap`) and pass the layer to it:
+To obtain geo-object wrappers for a vector layer invoke the `getGeoObjectWrappersMap()` method of the `GeoMapImpl` class (implementation of the `GeoMap`) and pass the layer to it:
 
 [source,java]
 ----
 VectorLayer<Territory> territoriesLayer = map.getLayer("territoriesLayer");
 Map<?, GeoObjectWrapper<Salesperson>> geoObjectWrappersMap =
-        ((WebGeoMap) map).getGeoObjectWrappersMap(territoriesLayer);
+        ((GeoMapImpl) map).getGeoObjectWrappersMap(territoriesLayer);
 ----
-The returned map contains entries in which keys are geo-objects IDs and values are corresponding `GeoObjectWrapper` instances. So you can obtain `GeoObjectWrapper` of the particular geo-object this way:
+The returned map contains entries in which keys are geo-objects IDs (or geo-objects themselves for those whose ID = null) and values are corresponding `GeoObjectWrapper` instances. So you can obtain `GeoObjectWrapper` of the particular geo-object this way:
 [source,java]
 ----
 GeoObjectWrapper<Salesperson> geoObjectWrapper = geoObjectWrappersMap.get(salesperson.getId());
@@ -815,7 +816,7 @@ image::heatmap.png[]
 ----
 <maps:heatmap id="heatmapLayer" dataContainer="ordersDc"/>
 ----
-or created programmatically in a screen controller using `com.haulmont.addon.maps.web.gui.components.layer.HeatMapLayer` class:
+or created programmatically in a screen controller using `io.jmix.mapsui.component.layer.HeatMapLayer` class:
 [source,java]
 ----
 HeatMapLayer heatMapLayer = new HeatMapLayer("heatmapLayer");
@@ -921,11 +922,12 @@ Here is an example:
 [source,java]
 ----
 CanvasLayer.Point location = canvasLayer.addPoint(address.getLocation());
-location.setStyle(new PointStyle(
-        new FontPointIcon(CubaIcon.HOME)
-                .setIconPathFillColor("#ff0000")
-                .setIconTextFillColor("white")
-                .setIconPathStrokeColor("black")))
+location.setStyle(
+         geometryStyles.point()
+                 .withFontIcon(JmixIcon.HOME)
+                 .setIconPathFillColor("#ff0000")
+                 .setIconTextFillColor("white")
+                 .setIconPathStrokeColor("black"))
         .setPopupContent(address.getName())
         .setEditable(true)
         .addModifiedListener(modifiedEvent -> address.setLocation(modifiedEvent.getGeometry()));
@@ -1052,11 +1054,14 @@ Point style is defined by its icon. There are different kinds of icons:
 +
 [source,java]
 ----
+@Autowired
+private GeometryStyles geometryStyles;
+
 @Install(to = "map.orderLayer", subject = "styleProvider")
 private GeometryStyle orderLayerStyleProvider(Order order) {
-    return new PointStyle(
-            new FontPointIcon(CubaIcon.SHOPPING_BASKET)
-                    .setIconPathFillColor("#0051d3"));
+    return geometryStyles.point()
+                .withFontIcon(JmixIcon.SHOPPING_BASKET)
+                .setIconPathFillColor("#0051d3");
 }
 ----
 +
@@ -1065,11 +1070,14 @@ image::font-icons.png[]
 +
 [source,java]
 ----
+@Autowired
+private GeometryStyles geometryStyles;
+
 @Install(to = "map.orderLayer", subject = "styleProvider")
 private GeometryStyle orderLayerStyleProvider(Order order) {
-    return new PointStyle(
-            new ImagePointIcon("classpath:/com/haulmont/demo/maps/web/cuba_icon.png")
-                    .setIconSize(33, 33));
+    return geometryStyles.point()
+                .withImageIcon("classpath:/com/haulmont/demo/maps/web/jmix_icon.png")
+                .setIconSize(33, 33);
 }
 ----
 4. `DivPointIcon` is a fully custom lightweight icon that uses the `<div>` element instead of an image.
@@ -1078,15 +1086,18 @@ For example, you can create an icon that combines an image with a text label:
 +
 [source,java]
 ----
+@Autowired
+private GeometryStyles geometryStyles;
+
 private String divElement = "<img src='https://cdn3.iconfinder.com/data/icons/business-avatar-1/512/3_avatar-128.png' width=60 height = 60/>\n" +
             "<font color = 'green' face = 'arial' size = 2> <i>NAME</i></font>";
 
 @Install(to = "map.salespersonLayer", subject = "styleProvider")
 private GeometryStyle salespersonLayerStyleProvider(Salesperson salesperson) {
-    return new PointStyle(
-            new DivPointIcon(divElement.replaceAll("NAME", salesperson.getName()))
-                    .setStyles("my-div-style")
-                    .setPopupAnchor(30, 0));
+    return geometryStyles.point()
+                .withDivIcon("classpath:/com/haulmont/demo/maps/web/jmix_icon.png")
+                .setStyles("my-div-style")
+                .setPopupAnchor(30, 0));
 }
 ----
 Points with this style look like this:
@@ -1160,9 +1171,9 @@ The `GeoMap` UI component displays a map. The map is built by superposing multip
 
 *`VectorLayer` methods*:
 
-    * `void setStyleProvider(Function<? super T, GeometryStyle>)` — sets a function that determines geometry style for a given geo-object. In CUBA 7.0+ screens you can perform this declaratively using the `@Install` annotation in the screen controller.
+    * `void setStyleProvider(Function<? super T, GeometryStyle>)` — sets a function that determines geometry style for a given geo-object. You can perform this declaratively using the `@Install` annotation in the screen controller.
 
-    * `setPopupContentProvider(Function<? super T, String>)` — sets a function that determines content for bound pop-ups which will be opened by clicking on geo-objects on a map. In CUBA 7 screens you can perform this declaratively using the @Install annotation in the screen controller, for example:
+    * `setPopupContentProvider(Function<? super T, String>)` — sets a function that determines content for bound pop-ups which will be opened by clicking on geo-objects on a map. You can perform this declaratively using the @Install annotation in the screen controller, for example:
 +
 [source,java]
 ----
