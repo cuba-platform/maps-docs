@@ -49,6 +49,12 @@ Also, see the video tutorial on the https://youtu.be/mJsmpIXzcbU[CUBA YouTube ch
 
 [[release_notes]]
 == Release Notes
+[discrete]
+[[release_1_3_1]]
+=== Release 1.3.1
+
+. Added `GeoObjectClickEvent` to `VectorLayer`.
+. Added `MouseEventDetails` to click events. Can be useful, for example, to receive double-click events.
 
 [discrete]
 [[release_1_3_0]]
@@ -253,6 +259,7 @@ where `<add-on version>` is compatible with the used version of the CUBA platfor
 +
 |===
 | Platform Version | Add-on Version
+| 7.2.5+           | 1.3.1
 | 7.2.x            | 1.3.0
 | 7.1.x            | 1.1.0
 | 7.0.x            | 1.0.0 
@@ -264,7 +271,7 @@ For example:
 ----
 dependencies {
    //...
-   appComponent("com.haulmont.addon.maps:maps-global:1.3.0")
+   appComponent("com.haulmont.addon.maps:maps-global:1.3.1")
 }
 ----
 +
@@ -709,6 +716,21 @@ private void onTerritorySelected(VectorLayer.GeoObjectSelectedEvent<Territory> e
     territoriesTable.setSelected(event.getItem());
 }
 ----
+
+[TIP]
+====
+By default, geo-objects are selected by click, but you can change this behavior by setting `selectGeoObjectOnClick` property to `false` and handling geo-objects selection manually. For example, if you want to select geo-object by double-click, it can be implemented this way:
+[source,java]
+----
+@Subscribe("map.territoriesLayer")
+private void onTerritoryClick(VectorLayer.GeoObjectClickEvent<Territory> event) {
+    boolean doubleClick = event.getMouseEventDetails().isDoubleClick();
+    if (doubleClick) {
+        event.getSource().setSelectedGeoObject(event.getItem());
+    }
+}
+----
+====
 
 The geometry of a geo-object can be interactively modified if the layer is set as editable. First, you need to select the geo-object via UI by clicking on it, or programmatically by calling the `setSelectedGeoObject` method of the `VectorLayer`. After that the geometry of the selected geo-object can be edited in one of the ways described below:
 
